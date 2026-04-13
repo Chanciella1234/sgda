@@ -1,0 +1,7 @@
+target/
+*.class
+*.war
+.vscode/
+nbproject/
+*.iml
+*.nb-gradle/
