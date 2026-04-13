@@ -27,7 +27,7 @@ public class StudentDemandeDetailServlet extends BaseServlet {
 
         request.setAttribute("demande", demande);
         request.setAttribute("roleBasePath", "/student");
-        request.setAttribute("canComment", true);
+        request.setAttribute("backPath", "/student/demandes");
         request.setAttribute("canUpload", "BROUILLON".equals(demande.getEtat().getCode()));
         exposeFlash(request);
         forward(request, response, "/WEB-INF/views/common/demande-detail.jsp");

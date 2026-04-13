@@ -1,6 +1,5 @@
 package com.sgda.service;
 
-import com.sgda.domain.Commentaire;
 import com.sgda.domain.Demande;
 import com.sgda.domain.EtatDemande;
 import com.sgda.domain.HistoriqueTransition;
@@ -68,6 +67,21 @@ public class DemandeService extends AbstractService {
                 .getResultList();
     }
 
+    public List<Demande> listDemandesTraiteesParAgent(Long agentId) {
+        return entityManager.createQuery(
+                "SELECT d FROM Demande d "
+                + "JOIN FETCH d.typeDemande "
+                + "JOIN FETCH d.etat "
+                + "JOIN FETCH d.etudiant "
+                + "JOIN FETCH d.agent "
+                + "WHERE d.agent.id = :agentId "
+                + "AND d.dateDecision IS NOT NULL "
+                + "ORDER BY d.dateDecision DESC, d.dateCreation DESC",
+                Demande.class)
+                .setParameter("agentId", agentId)
+                .getResultList();
+    }
+
     public List<Demande> listAllDemandes() {
         return entityManager.createQuery(
                 "SELECT d FROM Demande d "
@@ -99,11 +113,9 @@ public class DemandeService extends AbstractService {
         }
 
         ensureDemandeVisible(demande, utilisateur);
-        List<Commentaire> commentaires = loadCommentaires(demandeId);
         List<PieceJointe> piecesJointes = loadPiecesJointes(demandeId);
         List<HistoriqueTransition> historique = loadHistorique(demandeId);
         entityManager.detach(demande);
-        demande.setCommentaires(commentaires);
         demande.setPiecesJointes(piecesJointes);
         demande.setHistoriqueTransitions(historique);
         return demande;
@@ -246,21 +258,6 @@ public class DemandeService extends AbstractService {
         enregistrerTransition(demande, ancienEtat, nouvelEtat, administrateur, "Archivage administratif.");
     }
 
-    public void ajouterCommentaire(Long demandeId, Long auteurId, String contenu) {
-        requireText(contenu, "Le commentaire est obligatoire.");
-
-        Utilisateur auteur = requireUtilisateurActif(auteurId);
-        Demande demande = requireEntity(Demande.class, demandeId, "Demande introuvable.");
-        ensureCommentAccess(demande, auteur);
-
-        Commentaire commentaire = new Commentaire();
-        commentaire.setDemande(demande);
-        commentaire.setAuteur(auteur);
-        commentaire.setContenu(normalize(contenu));
-        commentaire.setCreeLe(LocalDateTime.now());
-        entityManager.persist(commentaire);
-    }
-
     public PieceJointe ajouterPieceJointe(Long demandeId, Long auteurId, String nomOriginal, String mimeType,
             long tailleOctets, String cheminStockage, String sha256) {
         requireText(nomOriginal, "Le nom du fichier est obligatoire.");
@@ -350,14 +347,6 @@ public class DemandeService extends AbstractService {
         }
     }
 
-    private void ensureCommentAccess(Demande demande, Utilisateur auteur) {
-        if (!auteur.hasRole(RoleCode.ADMIN)
-                && !demande.getEtudiant().getId().equals(auteur.getId())
-                && (demande.getAgent() == null || !demande.getAgent().getId().equals(auteur.getId()))) {
-            throw new AuthorizationException("Vous ne pouvez pas commenter cette demande.");
-        }
-    }
-
     private void ensureDemandeVisible(Demande demande, Utilisateur utilisateur) {
         if (utilisateur.hasRole(RoleCode.ADMIN)) {
             return;
@@ -376,17 +365,6 @@ public class DemandeService extends AbstractService {
             return;
         }
         throw new AuthorizationException("Role non autorise.");
-    }
-
-    private List<Commentaire> loadCommentaires(Long demandeId) {
-        return entityManager.createQuery(
-                "SELECT c FROM Commentaire c "
-                + "JOIN FETCH c.auteur "
-                + "WHERE c.demande.id = :demandeId "
-                + "ORDER BY c.creeLe DESC",
-                Commentaire.class)
-                .setParameter("demandeId", demandeId)
-                .getResultList();
     }
 
     private List<PieceJointe> loadPiecesJointes(Long demandeId) {

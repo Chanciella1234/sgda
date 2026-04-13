@@ -10,13 +10,17 @@
         <div style="margin-top: 0.5rem;">
             <c:choose>
                 <c:when test="${sessionScope.SGDA_AUTH_USER.roleCode == 'ETUDIANT'}">
+                    <a href="${pageContext.request.contextPath}/student/dashboard">Dashboard</a>
                     <a href="${pageContext.request.contextPath}/student/demandes">Mes demandes</a>
                     <a href="${pageContext.request.contextPath}/student/demande/new">Nouvelle demande</a>
                 </c:when>
                 <c:when test="${sessionScope.SGDA_AUTH_USER.roleCode == 'AGENT'}">
+                    <a href="${pageContext.request.contextPath}/agent/dashboard">Dashboard</a>
                     <a href="${pageContext.request.contextPath}/agent/demandes">Demandes a traiter</a>
+                    <a href="${pageContext.request.contextPath}/agent/demandes-traitees">Mes demandes traitees</a>
                 </c:when>
                 <c:when test="${sessionScope.SGDA_AUTH_USER.roleCode == 'ADMIN'}">
+                    <a href="${pageContext.request.contextPath}/admin/dashboard">Dashboard</a>
                     <a href="${pageContext.request.contextPath}/admin/demandes">Supervision</a>
                     <a href="${pageContext.request.contextPath}/admin/users">Utilisateurs</a>
                     <a href="${pageContext.request.contextPath}/admin/types">Types</a>

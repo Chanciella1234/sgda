@@ -64,7 +64,7 @@
                     </tbody>
                 </table>
                 <div class="actions">
-                    <a class="btn btn-secondary" href="${pageContext.request.contextPath}${roleBasePath}/demandes">Retour</a>
+                    <a class="btn btn-secondary" href="${pageContext.request.contextPath}${backPath}">Retour</a>
                     <c:if test="${roleBasePath == '/student' && canUpload}">
                         <a class="btn btn-warning" href="${pageContext.request.contextPath}/student/demande/edit?id=${demande.id}">Modifier</a>
                     </c:if>
@@ -132,38 +132,6 @@
         </div>
 
         <div>
-            <div class="panel">
-                <h2>Commentaires</h2>
-                <c:if test="${canComment}">
-                    <form method="post" action="${pageContext.request.contextPath}${roleBasePath}/demande/comment">
-                        <input type="hidden" name="demandeId" value="${demande.id}">
-                        <div class="form-row">
-                            <label for="contenu">Nouveau commentaire</label>
-                            <textarea id="contenu" name="contenu" required></textarea>
-                        </div>
-                        <button class="btn btn-primary" type="submit">Publier</button>
-                    </form>
-                </c:if>
-                <c:if test="${not canComment}">
-                    <p class="muted">Vous pouvez consulter les commentaires mais pas en ajouter sur cette demande.</p>
-                </c:if>
-
-                <c:choose>
-                    <c:when test="${empty demande.commentaires}">
-                        <div class="empty-state">Aucun commentaire.</div>
-                    </c:when>
-                    <c:otherwise>
-                        <c:forEach var="commentaire" items="${demande.commentaires}">
-                            <div class="panel" style="box-shadow:none;border:1px solid #e2e8f0;">
-                                <strong>${commentaire.auteur.nomComplet}</strong>
-                                <div class="muted">${commentaire.creeLe}</div>
-                                <p>${commentaire.contenu}</p>
-                            </div>
-                        </c:forEach>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-
             <div class="panel">
                 <h2>Historique</h2>
                 <c:choose>

@@ -25,10 +25,11 @@ public class AgentDemandeDetailServlet extends BaseServlet {
         Long demandeId = ServletUtils.paramAsLong(request, "id");
         Demande demande = demandeService.findDetailForUser(demandeId, user.getId());
 
-        boolean canComment = demande.getAgent() != null && demande.getAgent().getId().equals(user.getId());
+        String source = ServletUtils.param(request, "source");
+        String backPath = "traitees".equals(source) ? "/agent/demandes-traitees" : "/agent/demandes";
         request.setAttribute("demande", demande);
         request.setAttribute("roleBasePath", "/agent");
-        request.setAttribute("canComment", canComment);
+        request.setAttribute("backPath", backPath);
         request.setAttribute("canUpload", false);
         exposeFlash(request);
         forward(request, response, "/WEB-INF/views/common/demande-detail.jsp");

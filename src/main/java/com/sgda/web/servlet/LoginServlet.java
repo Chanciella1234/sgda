@@ -36,14 +36,14 @@ public class LoginServlet extends BaseServlet {
             request.getSession().setAttribute(SessionKeys.AUTH_USER, user);
 
             if ("ADMIN".equals(user.getRoleCode())) {
-                redirect(request, response, "/admin/demandes");
+                redirect(request, response, "/admin/dashboard");
                 return;
             }
             if ("AGENT".equals(user.getRoleCode())) {
-                redirect(request, response, "/agent/demandes");
+                redirect(request, response, "/agent/dashboard");
                 return;
             }
-            redirect(request, response, "/student/demandes");
+            redirect(request, response, "/student/dashboard");
         } catch (BusinessException ex) {
             request.setAttribute("error", ex.getMessage());
             forward(request, response, "/WEB-INF/views/auth/login.jsp");
