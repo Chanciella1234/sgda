@@ -1,5 +1,21 @@
-﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<c:choose>
+    <c:when test="${roleBasePath == '/student'}">
+        <c:set var="pageSection" value="Espace etudiant"/>
+        <c:set var="activeMenu" value="demandes"/>
+    </c:when>
+    <c:when test="${roleBasePath == '/agent'}">
+        <c:set var="pageSection" value="Espace agent"/>
+        <c:set var="activeMenu" value="${backPath == '/agent/demandes-traitees' ? 'demandes-traitees' : 'demandes'}"/>
+    </c:when>
+    <c:otherwise>
+        <c:set var="pageSection" value="Administration"/>
+        <c:set var="activeMenu" value="demandes"/>
+    </c:otherwise>
+</c:choose>
+<c:set var="pageTitle" value="${demande.code}"/>
+<c:set var="pageSubtitle" value="Consulte le detail complet de la demande et son historique de transition."/>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,17 +25,23 @@
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
-<div class="container">
-    <jsp:include page="/WEB-INF/views/common/flash.jsp"/>
-    <div class="page-grid">
-        <div>
-            <div class="panel">
-                <h1>${demande.code}</h1>
+<jsp:include page="/WEB-INF/views/common/flash.jsp"/>
+
+<div class="page-grid">
+    <div>
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h2 class="panel-title">Informations generales</h2>
+                    <p class="panel-note">Etat, type, etudiant et contenu principal de la demande.</p>
+                </div>
+            </div>
+            <div class="panel-body">
                 <table class="table meta-table">
                     <tbody>
                     <tr>
                         <td>Etat</td>
-                        <td><span class="badge">${demande.etat.libelle}</span></td>
+                        <td><span class="badge badge-${demande.etat.code}">${demande.etat.libelle}</span></td>
                     </tr>
                     <tr>
                         <td>Etudiant</td>
@@ -65,75 +87,23 @@
                 </table>
                 <div class="actions">
                     <a class="btn btn-secondary" href="${pageContext.request.contextPath}${backPath}">Retour</a>
-                    <c:if test="${roleBasePath == '/student' && canUpload}">
-                        <a class="btn btn-warning" href="${pageContext.request.contextPath}/student/demande/edit?id=${demande.id}">Modifier</a>
+                    <c:if test="${roleBasePath == '/student' && demande.etat.code == 'BROUILLON'}">
+                        <a class="btn btn-primary" href="${pageContext.request.contextPath}/student/demande/edit?id=${demande.id}">Modifier</a>
                     </c:if>
                 </div>
             </div>
-
-            <div class="panel">
-                <h2>Pieces jointes</h2>
-                <c:choose>
-                    <c:when test="${empty demande.piecesJointes}">
-                        <div class="empty-state">Aucune piece jointe.</div>
-                    </c:when>
-                    <c:otherwise>
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>Fichier</th>
-                                <th>Type MIME</th>
-                                <th>Taille</th>
-                                <th>Ajoutee le</th>
-                                <th>Actions</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <c:forEach var="piece" items="${demande.piecesJointes}">
-                                <tr>
-                                    <td>${piece.nomOriginal}</td>
-                                    <td>${piece.mimeType}</td>
-                                    <td>${piece.tailleOctets} octets</td>
-                                    <td>${piece.creeLe}</td>
-                                    <td>
-                                        <div class="actions">
-                                            <a class="btn btn-secondary"
-                                               href="${pageContext.request.contextPath}/piece/download?id=${piece.id}">
-                                                Telecharger
-                                            </a>
-                                            <c:if test="${canUpload}">
-                                                <form method="post" action="${pageContext.request.contextPath}/student/piece/delete">
-                                                    <input type="hidden" name="id" value="${piece.id}">
-                                                    <input type="hidden" name="demandeId" value="${demande.id}">
-                                                    <button class="btn btn-danger" type="submit">Supprimer</button>
-                                                </form>
-                                            </c:if>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </c:forEach>
-                            </tbody>
-                        </table>
-                    </c:otherwise>
-                </c:choose>
-
-                <c:if test="${canUpload}">
-                    <form method="post" enctype="multipart/form-data"
-                          action="${pageContext.request.contextPath}/student/demande/upload">
-                        <input type="hidden" name="demandeId" value="${demande.id}">
-                        <div class="form-row">
-                            <label for="fichier">Ajouter un document</label>
-                            <input id="fichier" name="fichier" type="file" required>
-                        </div>
-                        <button class="btn btn-primary" type="submit">Televerser</button>
-                    </form>
-                </c:if>
-            </div>
         </div>
+    </div>
 
-        <div>
-            <div class="panel">
-                <h2>Historique</h2>
+    <div>
+        <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title-group">
+                    <h2 class="panel-title">Historique</h2>
+                    <p class="panel-note">Toutes les transitions d etat enregistrees pour cette demande.</p>
+                </div>
+            </div>
+            <div class="panel-body">
                 <c:choose>
                     <c:when test="${empty demande.historiqueTransitions}">
                         <div class="empty-state">Aucune transition enregistree.</div>
@@ -174,7 +144,7 @@
         </div>
     </div>
 </div>
+
 <jsp:include page="/WEB-INF/views/common/footer.jsp"/>
 </body>
 </html>
-

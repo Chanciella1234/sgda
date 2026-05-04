@@ -1,5 +1,9 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
+<c:set var="pageSection" value="Espace agent"/>
+<c:set var="pageTitle" value="Mes demandes traitees"/>
+<c:set var="pageSubtitle" value="Retrouve toutes les demandes pour lesquelles tu as deja pris une decision."/>
+<c:set var="activeMenu" value="demandes-traitees"/>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,11 +13,16 @@
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
-<div class="container">
-    <div class="panel">
-        <h1>Mes demandes traitees</h1>
-        <p class="muted">Retrouvez ici toutes les demandes sur lesquelles vous avez deja rendu une decision.</p>
-        <jsp:include page="/WEB-INF/views/common/flash.jsp"/>
+<jsp:include page="/WEB-INF/views/common/flash.jsp"/>
+
+<div class="panel">
+    <div class="panel-header">
+        <div class="panel-title-group">
+            <h2 class="panel-title">Historique de traitement</h2>
+            <p class="panel-note">Demandes validees, refusees ou deja archivees apres votre decision.</p>
+        </div>
+    </div>
+    <div class="panel-body">
         <c:choose>
             <c:when test="${empty demandes}">
                 <div class="empty-state">Vous n avez encore traite aucune demande.</div>
@@ -33,23 +42,20 @@
                     <tbody>
                     <c:forEach var="demande" items="${demandes}">
                         <tr>
-                            <td>${demande.code}</td>
+                            <td class="code-text">${demande.code}</td>
                             <td>${demande.etudiant.nomComplet}</td>
                             <td>${demande.typeDemande.libelle}</td>
                             <td>
-                                <span class="badge">${demande.etat.libelle}</span>
+                                <span class="badge badge-${demande.etat.code}">${demande.etat.libelle}</span>
                                 <c:if test="${demande.etat.code == 'ARCHIVEE'}">
                                     <div class="muted">Decision deja prise puis archivee</div>
                                 </c:if>
                             </td>
                             <td>${demande.dateDecision}</td>
                             <td>
-                                <div class="actions">
-                                    <a class="btn btn-secondary"
-                                       href="${pageContext.request.contextPath}/agent/demande/detail?id=${demande.id}&source=traitees">
-                                        Consulter
-                                    </a>
-                                </div>
+                                <a class="btn btn-secondary" href="${pageContext.request.contextPath}/agent/demande/detail?id=${demande.id}&source=traitees">
+                                    Consulter
+                                </a>
                             </td>
                         </tr>
                     </c:forEach>
@@ -59,6 +65,7 @@
         </c:choose>
     </div>
 </div>
+
 <jsp:include page="/WEB-INF/views/common/footer.jsp"/>
 </body>
 </html>
