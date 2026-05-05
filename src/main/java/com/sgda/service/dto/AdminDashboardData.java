@@ -8,6 +8,8 @@ import java.util.List;
 public class AdminDashboardData implements Serializable {
 
     private Long totalDemandes;
+    private Long demandesBrouillon;
+    private Long demandesSoumises;
     private Long demandesEnAttente;
     private Long demandesValidees;
     private Long demandesRefusees;
@@ -22,6 +24,22 @@ public class AdminDashboardData implements Serializable {
 
     public void setTotalDemandes(Long totalDemandes) {
         this.totalDemandes = totalDemandes;
+    }
+
+    public Long getDemandesBrouillon() {
+        return demandesBrouillon;
+    }
+
+    public void setDemandesBrouillon(Long demandesBrouillon) {
+        this.demandesBrouillon = demandesBrouillon;
+    }
+
+    public Long getDemandesSoumises() {
+        return demandesSoumises;
+    }
+
+    public void setDemandesSoumises(Long demandesSoumises) {
+        this.demandesSoumises = demandesSoumises;
     }
 
     public Long getDemandesEnAttente() {

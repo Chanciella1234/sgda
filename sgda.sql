@@ -6,8 +6,8 @@ SET NAMES utf8mb4;
 SET time_zone = '+00:00';
 
 DROP TABLE IF EXISTS historique_transition;
-DROP TABLE IF EXISTS piece_jointe;
-DROP TABLE IF EXISTS commentaire;
+-- DROP TABLE IF EXISTS piece_jointe;
+-- DROP TABLE IF EXISTS commentaire;
 DROP TABLE IF EXISTS demande;
 DROP TABLE IF EXISTS utilisateur;
 DROP TABLE IF EXISTS type_demande;
@@ -102,45 +102,45 @@ CREATE INDEX idx_demande_type ON demande(type_demande_id);
 CREATE INDEX idx_demande_etat ON demande(etat_id);
 CREATE INDEX idx_demande_date_creation ON demande(date_creation);
 
--- 4) Commentaires
-CREATE TABLE commentaire (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    demande_id BIGINT NOT NULL,
-    auteur_id BIGINT NOT NULL,
-    contenu TEXT NOT NULL,
-    cree_le TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_commentaire_demande
-        FOREIGN KEY (demande_id) REFERENCES demande(id)
-        ON UPDATE RESTRICT ON DELETE CASCADE,
-    CONSTRAINT fk_commentaire_auteur
-        FOREIGN KEY (auteur_id) REFERENCES utilisateur(id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- -- 4) Commentaires
+-- CREATE TABLE commentaire (
+--     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+--     demande_id BIGINT NOT NULL,
+--     auteur_id BIGINT NOT NULL,
+--     contenu TEXT NOT NULL,
+--     cree_le TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     CONSTRAINT fk_commentaire_demande
+--         FOREIGN KEY (demande_id) REFERENCES demande(id)
+--         ON UPDATE RESTRICT ON DELETE CASCADE,
+--     CONSTRAINT fk_commentaire_auteur
+--         FOREIGN KEY (auteur_id) REFERENCES utilisateur(id)
+--         ON UPDATE RESTRICT ON DELETE RESTRICT
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE INDEX idx_commentaire_demande ON commentaire(demande_id);
-CREATE INDEX idx_commentaire_auteur ON commentaire(auteur_id);
+-- CREATE INDEX idx_commentaire_demande ON commentaire(demande_id);
+-- CREATE INDEX idx_commentaire_auteur ON commentaire(auteur_id);
 
--- 5) Pieces jointes
-CREATE TABLE piece_jointe (
-    id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    demande_id BIGINT NOT NULL,
-    uploade_par_id BIGINT NOT NULL,
-    nom_original VARCHAR(255) NOT NULL,
-    mime_type VARCHAR(120) NOT NULL,
-    taille_octets BIGINT NOT NULL,
-    chemin_stockage VARCHAR(500) NOT NULL,
-    sha256 VARCHAR(64) NULL,
-    cree_le TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_piece_jointe_demande
-        FOREIGN KEY (demande_id) REFERENCES demande(id)
-        ON UPDATE RESTRICT ON DELETE CASCADE,
-    CONSTRAINT fk_piece_jointe_uploade_par
-        FOREIGN KEY (uploade_par_id) REFERENCES utilisateur(id)
-        ON UPDATE RESTRICT ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+-- -- 5) Pieces jointes
+-- CREATE TABLE piece_jointe (
+--     id BIGINT AUTO_INCREMENT PRIMARY KEY,
+--     demande_id BIGINT NOT NULL,
+--     uploade_par_id BIGINT NOT NULL,
+--     nom_original VARCHAR(255) NOT NULL,
+--     mime_type VARCHAR(120) NOT NULL,
+--     taille_octets BIGINT NOT NULL,
+--     chemin_stockage VARCHAR(500) NOT NULL,
+--     sha256 VARCHAR(64) NULL,
+--     cree_le TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--     CONSTRAINT fk_piece_jointe_demande
+--         FOREIGN KEY (demande_id) REFERENCES demande(id)
+--         ON UPDATE RESTRICT ON DELETE CASCADE,
+--     CONSTRAINT fk_piece_jointe_uploade_par
+--         FOREIGN KEY (uploade_par_id) REFERENCES utilisateur(id)
+--         ON UPDATE RESTRICT ON DELETE RESTRICT
+-- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE INDEX idx_piece_jointe_demande ON piece_jointe(demande_id);
-CREATE INDEX idx_piece_jointe_uploade_par ON piece_jointe(uploade_par_id);
+-- CREATE INDEX idx_piece_jointe_demande ON piece_jointe(demande_id);
+-- CREATE INDEX idx_piece_jointe_uploade_par ON piece_jointe(uploade_par_id);
 
 -- 6) Historique du workflow
 CREATE TABLE historique_transition (

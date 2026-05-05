@@ -3,6 +3,7 @@ package com.sgda.web.servlet;
 import com.sgda.service.dto.AuthenticatedUser;
 import com.sgda.web.util.SessionKeys;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -40,6 +41,13 @@ public abstract class BaseServlet extends HttpServlet {
             request.getSession().removeAttribute("FLASH_TYPE");
             request.getSession().removeAttribute("FLASH_MESSAGE");
         }
+    }
+
+    protected void writeJson(HttpServletResponse response, String payload) throws IOException {
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.setContentType("application/json");
+        response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+        response.getWriter().write(payload);
     }
 }
 

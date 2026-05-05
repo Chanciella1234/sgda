@@ -7,11 +7,21 @@ import java.util.List;
 
 public class AgentDashboardData implements Serializable {
 
+    private Long demandesATraiter;
     private Long totalDemandesTraitees;
     private Long demandesValideesParAgent;
     private Long demandesRefuseesParAgent;
     private Long demandesEnCours;
     private List<Demande> dernieresDemandes = new ArrayList<>();
+    private List<Demande> demandesPrioritaires = new ArrayList<>();
+
+    public Long getDemandesATraiter() {
+        return demandesATraiter;
+    }
+
+    public void setDemandesATraiter(Long demandesATraiter) {
+        this.demandesATraiter = demandesATraiter;
+    }
 
     public Long getTotalDemandesTraitees() {
         return totalDemandesTraitees;
@@ -51,5 +61,13 @@ public class AgentDashboardData implements Serializable {
 
     public void setDernieresDemandes(List<Demande> dernieresDemandes) {
         this.dernieresDemandes = dernieresDemandes;
+    }
+
+    public List<Demande> getDemandesPrioritaires() {
+        return demandesPrioritaires;
+    }
+
+    public void setDemandesPrioritaires(List<Demande> demandesPrioritaires) {
+        this.demandesPrioritaires = demandesPrioritaires;
     }
 }

@@ -30,7 +30,6 @@ public class AgentDemandeDetailServlet extends BaseServlet {
         request.setAttribute("demande", demande);
         request.setAttribute("roleBasePath", "/agent");
         request.setAttribute("backPath", backPath);
-        request.setAttribute("canUpload", false);
         exposeFlash(request);
         forward(request, response, "/WEB-INF/views/common/demande-detail.jsp");
     }

@@ -28,7 +28,6 @@ public class AdminDemandeDetailServlet extends BaseServlet {
         request.setAttribute("demande", demande);
         request.setAttribute("roleBasePath", "/admin");
         request.setAttribute("backPath", "/admin/demandes");
-        request.setAttribute("canUpload", false);
         exposeFlash(request);
         forward(request, response, "/WEB-INF/views/common/demande-detail.jsp");
     }

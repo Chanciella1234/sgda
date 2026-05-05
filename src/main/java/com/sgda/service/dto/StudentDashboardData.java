@@ -8,6 +8,7 @@ import java.util.List;
 public class StudentDashboardData implements Serializable {
 
     private Long totalDemandes;
+    private Long demandesBrouillons;
     private Long demandesValidees;
     private Long demandesRefusees;
     private Long demandesEnCours;
@@ -19,6 +20,14 @@ public class StudentDashboardData implements Serializable {
 
     public void setTotalDemandes(Long totalDemandes) {
         this.totalDemandes = totalDemandes;
+    }
+
+    public Long getDemandesBrouillons() {
+        return demandesBrouillons;
+    }
+
+    public void setDemandesBrouillons(Long demandesBrouillons) {
+        this.demandesBrouillons = demandesBrouillons;
     }
 
     public Long getDemandesValidees() {

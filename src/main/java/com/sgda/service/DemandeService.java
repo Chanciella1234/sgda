@@ -113,10 +113,8 @@ public class DemandeService extends AbstractService {
         }
 
         ensureDemandeVisible(demande, utilisateur);
-        List<PieceJointe> piecesJointes = loadPiecesJointes(demandeId);
         List<HistoriqueTransition> historique = loadHistorique(demandeId);
         entityManager.detach(demande);
-        demande.setPiecesJointes(piecesJointes);
         demande.setHistoriqueTransitions(historique);
         return demande;
     }
