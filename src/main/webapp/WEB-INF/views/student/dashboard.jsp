@@ -307,7 +307,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     Number('${dashboard.demandesValidees}'),
                     Number('${dashboard.demandesRefusees}')
                 ],
-                backgroundColor: ['#888780', '#ba7517', '#3b6d11', '#a32d2d'],
+                backgroundColor: ['#888780', '#D84315', '#4A5C2A', '#BF360C'],
                 borderWidth: 0,
                 hoverOffset: 6
             }]

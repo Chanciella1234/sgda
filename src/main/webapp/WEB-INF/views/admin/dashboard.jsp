@@ -350,8 +350,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     label: 'Utilisateurs',
                     data: [nbAdmins, nbAgents, nbEtudiants],
-                    backgroundColor: ['rgba(83, 74, 183, 0.22)', 'rgba(46, 94, 170, 0.24)', 'rgba(59, 109, 17, 0.22)'],
-                    borderColor: ['#534ab7', '#2e5eaa', '#3b6d11'],
+                    backgroundColor: ['rgba(201,138,62,.22)', 'rgba(74,92,42,.24)', 'rgba(26,46,15,.22)'],
+                    borderColor: ['#C98A3E', '#4A5C2A', '#1A2E0F'],
                     borderWidth: 2,
                     borderRadius: 12
                 }]
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: ['Brouillon', 'Soumise', 'En attente', 'Validee', 'Refusee', 'Archivee'],
                 datasets: [{
                     data: statusCounts,
-                    backgroundColor: ['#888780', '#378add', '#ba7517', '#3b6d11', '#a32d2d', '#444441'],
+                    backgroundColor: ['#888780', '#C98A3E', '#D84315', '#4A5C2A', '#BF360C', '#7A4010'],
                     borderWidth: 0,
                     hoverOffset: 6
                 }]
@@ -423,8 +423,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     label: 'Demandes soumises',
                     data: trendData.soumises,
-                    borderColor: '#2e5eaa',
-                    backgroundColor: 'rgba(46, 94, 170, 0.10)',
+                    borderColor: '#C98A3E',
+                    backgroundColor: 'rgba(201,138,62,0.10)',
                     fill: true,
                     tension: 0.35,
                     pointRadius: 5,
@@ -434,8 +434,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }, {
                     label: 'Demandes traitees',
                     data: trendData.traitees,
-                    borderColor: '#2e7d32',
-                    backgroundColor: 'rgba(46, 125, 50, 0.10)',
+                    borderColor: '#4A5C2A',
+                    backgroundColor: 'rgba(74,92,42,0.10)',
                     fill: true,
                     tension: 0.35,
                     pointRadius: 5,

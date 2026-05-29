@@ -1,271 +1,223 @@
+/* ============================================================
+   SGDA — app.js
+   Interactions: sidebar toggle, dark mode, toasts, confirm,
+   ripple, table filters, animations
+   ============================================================ */
+
 (function () {
-    function initSidebar() {
-        var toggle = document.getElementById("navToggle");
-        var sidebar = document.getElementById("appSidebar");
+  'use strict';
 
-        if (!toggle || !sidebar) {
-            return;
-        }
+  /* ── Dark mode ─────────────────────────────────────────── */
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    try { localStorage.setItem('sgda-theme', theme); } catch(e) {}
+  }
+  function initTheme() {
+    var saved;
+    try { saved = localStorage.getItem('sgda-theme'); } catch(e) {}
+    var preferred = saved || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(preferred);
+  }
+  initTheme();
 
-        function openSidebar() {
-            document.body.classList.add("sidebar-open");
-            toggle.setAttribute("aria-expanded", "true");
-            
-            // GSAP animation for sidebar opening
-            gsap.fromTo(sidebar,
-                { x: -sidebar.offsetWidth },
-                {
-                    x: 0,
-                    duration: 0.4,
-                    ease: "power2.out",
-                    onStart: function() {
-                        sidebar.style.transform = "translateX(0)";
-                    }
-                }
-            );
-            
-            // Animate nav toggle button
-            gsap.to(toggle, {
-                rotation: 90,
-                duration: 0.3,
-                ease: "power2.out"
-            });
-        }
+  /* ── Run after DOM ready ───────────────────────────────── */
+  document.addEventListener('DOMContentLoaded', function () {
 
-        function closeSidebar() {
-            document.body.classList.remove("sidebar-open");
-            toggle.setAttribute("aria-expanded", "false");
-            
-            // GSAP animation for sidebar closing
-            gsap.to(sidebar, {
-                x: -sidebar.offsetWidth,
-                duration: 0.4,
-                ease: "power2.out",
-                onComplete: function() {
-                    sidebar.style.transform = "translateX(-100%)";
-                }
-            });
-            
-            // Animate nav toggle button back
-            gsap.to(toggle, {
-                rotation: 0,
-                duration: 0.3,
-                ease: "power2.out"
-            });
-        }
-
-        toggle.addEventListener("click", function () {
-            if (document.body.classList.contains("sidebar-open")) {
-                closeSidebar();
-                return;
-            }
-            openSidebar();
-        });
-
-        document.querySelectorAll("[data-sidebar-close]").forEach(function (node) {
-            node.addEventListener("click", closeSidebar);
-        });
-
-        document.querySelectorAll(".sidebar .nav-item, .sidebar .logout-btn").forEach(function (node) {
-            node.addEventListener("click", function () {
-                if (window.innerWidth < 768) {
-                    closeSidebar();
-                }
-            });
-        });
-
-        window.addEventListener("resize", function () {
-            if (window.innerWidth >= 768) {
-                closeSidebar();
-            }
-        });
-
-        document.addEventListener("keydown", function (event) {
-            if (event.key === "Escape" && document.body.classList.contains("sidebar-open")) {
-                closeSidebar();
-            }
-        });
+    /* Dark mode toggle button — inject into navbar */
+    var navbar = document.querySelector('.navbar-right, .user-info');
+    if (navbar) {
+      var toggleBtn = document.createElement('button');
+      toggleBtn.className = 'dark-toggle';
+      toggleBtn.setAttribute('aria-label', 'Basculer le mode sombre');
+      toggleBtn.title = 'Mode sombre / clair';
+      toggleBtn.addEventListener('click', function () {
+        var current = document.documentElement.getAttribute('data-theme');
+        applyTheme(current === 'dark' ? 'light' : 'dark');
+      });
+      var navRight = document.querySelector('.navbar-right');
+      if (!navRight) {
+        navRight = document.createElement('div');
+        navRight.className = 'navbar-right';
+        var navbar2 = document.querySelector('.navbar');
+        if (navbar2) navbar2.appendChild(navRight);
+      }
+      navRight.insertBefore(toggleBtn, navRight.firstChild);
     }
 
-    function initToasts() {
-        var stack = document.getElementById("toastStack");
-        if (!stack) {
-            return;
+    /* ── Sidebar toggle ─────────────────────────────────── */
+    var sidebar = document.getElementById('appSidebar');
+    var navToggle = document.getElementById('navToggle');
+    var overlay = document.querySelector('.sidebar-overlay');
+
+    function openSidebar() {
+      if (sidebar) sidebar.classList.add('is-open');
+      if (overlay) overlay.style.display = 'block';
+    }
+    function closeSidebar() {
+      if (sidebar) sidebar.classList.remove('is-open');
+      if (overlay) overlay.style.display = 'none';
+    }
+    if (navToggle) {
+      navToggle.addEventListener('click', function () {
+        if (sidebar && sidebar.classList.contains('is-open')) {
+          closeSidebar();
+        } else {
+          openSidebar();
         }
+      });
+    }
+    if (overlay) {
+      overlay.addEventListener('click', closeSidebar);
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeSidebar();
+    });
 
-        window.showToast = function (message, type) {
-            var toastType = type || "success";
-            var icon = toastType === "success" ? "&#10003;" : toastType === "error" ? "&#10005;" : toastType === "warning" ? "!" : "i";
-            var title = toastType === "success" ? "Succes" : toastType === "error" ? "Erreur" : toastType === "warning" ? "Avertissement" : "Information";
-
-            while (stack.children.length >= 3) {
-                stack.removeChild(stack.lastElementChild);
-            }
-
-            var toast = document.createElement("div");
-            toast.className = "toast toast-" + toastType;
-            toast.innerHTML =
-                "<div class=\"toast-icon\">" + icon + "</div>"
-                + "<div class=\"toast-body\">"
-                + "<strong class=\"toast-title\">" + title + "</strong>"
-                + "<div class=\"toast-message\"></div>"
-                + "<div class=\"toast-progress\"></div>"
-                + "</div>"
-                + "<button type=\"button\" class=\"toast-close\" aria-label=\"Fermer\">&times;</button>";
-
-            toast.querySelector(".toast-message").textContent = message;
-            stack.prepend(toast);
-
-            var removeToast = function () {
-                if (!toast.parentNode) {
-                    return;
-                }
-                toast.classList.add("toast-out");
-                window.setTimeout(function () {
-                    if (toast.parentNode) {
-                        toast.parentNode.removeChild(toast);
-                    }
-                }, 220);
-            };
-
-            var timeoutId = window.setTimeout(removeToast, 30000);
-            toast.querySelector(".toast-close").addEventListener("click", function () {
-                window.clearTimeout(timeoutId);
-                removeToast();
-            });
-        };
-
-        document.querySelectorAll(".toast-bootstrap").forEach(function (node) {
-            var message = node.getAttribute("data-toast-message");
-            var type = node.getAttribute("data-toast-type") || "success";
-            if (message) {
-                window.showToast(message, type);
-            }
-            node.remove();
-        });
+    /* ── Ripple on buttons ──────────────────────────────── */
+    document.addEventListener('click', function (e) {
+      var btn = e.target.closest('.btn');
+      if (!btn) return;
+      var ripple = document.createElement('span');
+      var rect = btn.getBoundingClientRect();
+      var size = Math.max(rect.width, rect.height) * 1.5;
+      ripple.style.cssText = [
+        'position:absolute',
+        'border-radius:50%',
+        'background:rgba(255,255,255,.25)',
+        'pointer-events:none',
+        'width:' + size + 'px',
+        'height:' + size + 'px',
+        'left:' + (e.clientX - rect.left - size / 2) + 'px',
+        'top:'  + (e.clientY - rect.top  - size / 2) + 'px',
+        'transform:scale(0)',
+        'animation:rippleAnim .45s ease-out forwards'
+      ].join(';');
+      btn.appendChild(ripple);
+      setTimeout(function () { ripple.remove(); }, 500);
+    });
+    /* Ripple keyframes (injected once) */
+    if (!document.getElementById('sgda-ripple-style')) {
+      var s = document.createElement('style');
+      s.id = 'sgda-ripple-style';
+      s.textContent = '@keyframes rippleAnim{to{transform:scale(1);opacity:0}}';
+      document.head.appendChild(s);
     }
 
-    function initConfirmModal() {
-        var modal = document.getElementById("confirmModal");
-        var dialog = modal ? modal.querySelector(".confirm-dialog") : null;
-        var titleNode = document.getElementById("confirmTitle");
-        var messageNode = document.getElementById("confirmMessage");
-        var badgeNode = document.getElementById("confirmBadge");
-        var cancelButton = document.getElementById("confirmCancel");
-        var acceptButton = document.getElementById("confirmAccept");
+    /* ── Toast system ───────────────────────────────────── */
+    var toastStack = document.getElementById('toastStack');
 
-        if (!modal || !dialog || !titleNode || !messageNode || !cancelButton || !acceptButton || !badgeNode) {
-            return;
-        }
+    window.showToast = function (message, type) {
+      if (!toastStack) return;
+      type = type || 'success';
+      var icons = { success: '✓', error: '✕', warning: '!', info: 'i' };
+      var titles = { success: 'Succès', error: 'Erreur', warning: 'Attention', info: 'Info' };
 
-        var pendingAction = null;
-        var lastFocusedElement = null;
+      var toast = document.createElement('div');
+      toast.className = 'toast toast-' + type;
+      toast.innerHTML = [
+        '<div class="toast-header">',
+        '  <div class="toast-title-row">',
+        '    <div class="toast-icon">' + (icons[type] || '!') + '</div>',
+        '    <span class="toast-title">' + (titles[type] || 'Info') + '</span>',
+        '  </div>',
+        '  <button class="toast-close" aria-label="Fermer">×</button>',
+        '</div>',
+        '<div class="toast-body">' + message + '</div>',
+        '<div class="toast-progress"></div>'
+      ].join('');
 
-        function setVariant(variant) {
-            modal.setAttribute("data-variant", variant);
-            acceptButton.className = variant === "danger" ? "btn btn-danger" : "btn btn-primary";
-            badgeNode.textContent = variant === "danger" ? "!" : "?";
-        }
+      toastStack.appendChild(toast);
 
-        function openModal(options, onConfirm) {
-            pendingAction = onConfirm;
-            lastFocusedElement = document.activeElement;
+      /* Limit to 3 */
+      var toasts = toastStack.querySelectorAll('.toast');
+      if (toasts.length > 3) toasts[0].remove();
 
-            titleNode.textContent = options.title || "Confirmer l action";
-            messageNode.textContent = options.message || "Voulez-vous continuer ?";
-            cancelButton.textContent = options.cancelLabel || "Annuler";
-            acceptButton.textContent = options.confirmLabel || "Confirmer";
-            setVariant(options.variant || "neutral");
+      function dismiss() {
+        toast.classList.add('hiding');
+        setTimeout(function () { toast.remove(); }, 350);
+      }
 
-            modal.removeAttribute("hidden");
-            document.body.classList.add("modal-open");
-            acceptButton.focus();
-        }
+      toast.querySelector('.toast-close').addEventListener('click', dismiss);
+      setTimeout(dismiss, 30000);
+    };
 
-        function closeModal() {
-            modal.setAttribute("hidden", "hidden");
-            document.body.classList.remove("modal-open");
-            pendingAction = null;
+    /* Bootstrap toasts from data attributes */
+    document.querySelectorAll('.toast-bootstrap').forEach(function (el) {
+      window.showToast(el.getAttribute('data-toast-message'), el.getAttribute('data-toast-type'));
+    });
 
-            if (lastFocusedElement && typeof lastFocusedElement.focus === "function") {
-                lastFocusedElement.focus();
-            }
-        }
+    /* ── Confirm dialog ─────────────────────────────────── */
+    var confirmModal   = document.getElementById('confirmModal');
+    var confirmTitle   = document.getElementById('confirmTitle');
+    var confirmMessage = document.getElementById('confirmMessage');
+    var confirmAccept  = document.getElementById('confirmAccept');
+    var confirmCancel  = document.getElementById('confirmCancel');
+    var confirmBadge   = document.getElementById('confirmBadge');
+    var pendingAction  = null;
 
-        function extractOptions(element) {
-            return {
-                title: element.getAttribute("data-confirm-title"),
-                message: element.getAttribute("data-confirm"),
-                confirmLabel: element.getAttribute("data-confirm-confirm-label"),
-                cancelLabel: element.getAttribute("data-confirm-cancel-label"),
-                variant: element.getAttribute("data-confirm-variant")
-            };
-        }
-
-        document.querySelectorAll("[data-confirm]").forEach(function (element) {
-            var options = extractOptions(element);
-
-            if (element.tagName === "FORM") {
-                element.addEventListener("submit", function (event) {
-                    event.preventDefault();
-                    openModal(options, function () {
-                        HTMLFormElement.prototype.submit.call(element);
-                    });
-                });
-                return;
-            }
-
-            element.addEventListener("click", function (event) {
-                event.preventDefault();
-                openModal(options, function () {
-                    window.location.assign(element.href);
-                });
-            });
-        });
-
-        acceptButton.addEventListener("click", function () {
-            var action = pendingAction;
-            closeModal();
-            if (typeof action === "function") {
-                action();
-            }
-        });
-
-        cancelButton.addEventListener("click", function (event) {
-            event.preventDefault();
-            closeModal();
-        });
-
-        modal.addEventListener("click", function (event) {
-            if (event.target.hasAttribute("data-confirm-close")) {
-                closeModal();
-            }
-        });
-
-        dialog.addEventListener("click", function (event) {
-            event.stopPropagation();
-        });
-
-        document.addEventListener("keydown", function (event) {
-            if (modal.hasAttribute("hidden")) {
-                return;
-            }
-
-            if (event.key === "Escape") {
-                closeModal();
-            }
-        });
+    function openConfirm(opts) {
+      if (!confirmModal) return;
+      if (confirmTitle)   confirmTitle.textContent   = opts.title   || 'Confirmer';
+      if (confirmMessage) confirmMessage.textContent = opts.message || 'Voulez-vous continuer ?';
+      if (confirmAccept)  confirmAccept.textContent  = opts.confirmLabel || 'Confirmer';
+      if (confirmCancel)  confirmCancel.textContent  = opts.cancelLabel  || 'Annuler';
+      pendingAction = opts.onConfirm;
+      confirmModal.hidden = false;
+    }
+    function closeConfirm() {
+      if (confirmModal) confirmModal.hidden = true;
+      pendingAction = null;
     }
 
-    function init() {
-        initSidebar();
-        initToasts();
-        initConfirmModal();
+    if (confirmAccept) {
+      confirmAccept.addEventListener('click', function () {
+        if (pendingAction) pendingAction();
+        closeConfirm();
+      });
     }
+    if (confirmCancel) confirmCancel.addEventListener('click', closeConfirm);
+    document.querySelectorAll('[data-confirm-close]').forEach(function (el) {
+      el.addEventListener('click', closeConfirm);
+    });
 
-    if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-    } else {
-        init();
-    }
+    /* Intercept forms / links with data-confirm */
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('[data-confirm]');
+      if (!trigger) return;
+      if (trigger.tagName === 'A' || (trigger.tagName === 'BUTTON' && trigger.type !== 'submit')) return;
+      e.preventDefault();
+      var form = trigger.closest('form') || trigger;
+      openConfirm({
+        title:        trigger.getAttribute('data-confirm-title')         || 'Confirmer l\'action',
+        message:      trigger.getAttribute('data-confirm')               || 'Voulez-vous continuer ?',
+        confirmLabel: trigger.getAttribute('data-confirm-confirm-label') || 'Confirmer',
+        cancelLabel:  trigger.getAttribute('data-confirm-cancel-label')  || 'Annuler',
+        onConfirm: function () {
+          if (trigger.tagName === 'BUTTON' && form && form.tagName === 'FORM') {
+            form.submit();
+          } else if (trigger.tagName === 'A') {
+            window.location.href = trigger.href;
+          }
+        }
+      });
+    });
+
+    /* ── Page dance animation on click ─────────────────── */
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.btn, .nav-item, .kpi-card')) return;
+      var cards = document.querySelectorAll('.kpi-card, .content-card, .hero-card');
+      cards.forEach(function (card, i) {
+        setTimeout(function () {
+          card.style.transition = 'transform .35s cubic-bezier(.34,1.56,.64,1)';
+          card.style.transform = 'translateY(6px)';
+          setTimeout(function () {
+            card.style.transform = 'translateY(0)';
+            setTimeout(function () { card.style.transition = ''; }, 350);
+          }, 120);
+        }, i * 30);
+      });
+    });
+
+  }); /* end DOMContentLoaded */
+
 })();

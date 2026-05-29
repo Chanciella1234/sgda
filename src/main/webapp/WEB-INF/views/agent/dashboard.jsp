@@ -199,15 +199,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 datasets: [{
                     label: payload.primaryLabel || 'Validees',
                     data: payload.primaryValues,
-                    backgroundColor: 'rgba(46, 125, 50, 0.24)',
-                    borderColor: '#2e7d32',
+                    backgroundColor: 'rgba(74,92,42,0.30)',
+                    borderColor: '#4A5C2A',
                     borderWidth: 2,
                     borderRadius: 12
                 }, {
                     label: payload.secondaryLabel || 'Refusees',
                     data: payload.secondaryValues,
-                    backgroundColor: 'rgba(198, 40, 40, 0.18)',
-                    borderColor: '#c62828',
+                    backgroundColor: 'rgba(191,54,12,0.25)',
+                    borderColor: '#BF360C',
                     borderWidth: 2,
                     borderRadius: 12
                 }]
@@ -279,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 labels: ['En attente', 'Validees', 'Refusees'],
                 datasets: [{
                     data: [totalInProgress, totalValidated, totalRejected],
-                    backgroundColor: ['#ba7517', '#3b6d11', '#a32d2d'],
+                    backgroundColor: ['#D84315', '#4A5C2A', '#BF360C'],
                     borderWidth: 0,
                     hoverOffset: 6
                 }]
