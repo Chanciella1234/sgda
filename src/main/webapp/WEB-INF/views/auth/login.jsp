@@ -8,74 +8,162 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css">
 </head>
 <body>
-<div class="login-shell">
-    <div class="login-layout">
-        <section class="login-aside">
-            <div>
-                <div class="login-kicker">Plateforme de gestion des demandes academiques</div>
-                <h1 class="login-title">La plateforme institutionnelle qui structure chaque demande academique</h1>
-                <p class="login-copy">
-                    SGDA centralise les demandes academiques dans un environnement sobre, fiable et premium. Chaque action, chaque transition et chaque decision reste lisible, tracee et maitrisee.
+<div class="login-shell auth-shell">
+    <div class="auth-layout">
+        <section class="login-aside auth-hero" aria-label="Presentation SGDA">
+            <span class="auth-hero-orb auth-hero-orb-a" aria-hidden="true"></span>
+            <span class="auth-hero-orb auth-hero-orb-b" aria-hidden="true"></span>
+            <span class="auth-hero-orb auth-hero-orb-c" aria-hidden="true"></span>
+
+            <div class="auth-brand-row">
+                <div class="auth-brand-copy">
+                    <span class="auth-brand">SGDA</span>
+                    <span class="auth-brand-subtitle">Systeme de gestion des demandes academiques</span>
+                </div>
+                <span class="auth-brand-badge">Institutionnel</span>
+            </div>
+
+            <div class="auth-hero-copy">
+                <h1 class="auth-hero-title">WELCOME</h1>
+                <div class="auth-hero-kicker">Votre espace academique centralise</div>
+                <p class="auth-hero-text">
+                    SGDA centralise les demandes academiques dans un environnement sobre, fiable et premium.
+                    Chaque action, chaque transition et chaque decision reste lisible, tracee et maitrisee.
                 </p>
             </div>
 
-            <div class="login-points">
-                <div class="login-point">
-                    <strong>Workflow institutionnel maitrise</strong>
-                    Chaque demande suit un circuit clair du brouillon a la decision finale avec une tracabilite continue.
+            <div class="auth-hero-points">
+                <div class="auth-hero-point">
+                    <strong>Workflow maitrise</strong>
+                    Du brouillon a la decision finale, chaque etape reste suivie et historisee.
                 </div>
-                <div class="login-point">
-                    <strong>Acces strictement controles</strong>
-                    Les etudiants, agents et administrateurs disposent chacun d un espace adapte a leurs responsabilites.
+                <div class="auth-hero-point">
+                    <strong>Acces controles</strong>
+                    Etudiants, agents et administrateurs disposent d un espace adapte a leurs responsabilites.
                 </div>
-                <div class="login-point">
-                    <strong>Execution professionnelle</strong>
-                    Interface lisible, traitement fiable, supervision globale et pilotage en temps reel pour l universite.
-                </div>
+            </div>
+
+            <div class="auth-hero-footer">
+                <span class="auth-hero-stat">3 roles</span>
+                <span class="auth-hero-stat">1 flux unique</span>
+                <span class="auth-hero-stat">Tracabilite continue</span>
             </div>
         </section>
 
-        <section class="login-card">
-            <div>
-                <div class="page-kicker">Connexion</div>
-                <h2 class="page-title">Acceder a votre espace SGDA</h2>
-                <p class="page-subtitle">Connectez-vous pour retrouver un environnement de travail clair, rapide et entierement adapte a votre role.</p>
-            </div>
+        <section class="login-card auth-card">
+            <div class="auth-card-inner">
+                <div class="auth-card-top">
+                    <div class="page-kicker">Connexion</div>
+                    <h2 class="auth-title">Sign in</h2>
+                    <p class="auth-subtitle">
+                        Connectez-vous pour retrouver un environnement de travail clair, rapide et entierement adapte a votre role.
+                    </p>
+                </div>
 
-            <jsp:include page="/WEB-INF/views/common/flash.jsp"/>
+                <jsp:include page="/WEB-INF/views/common/flash.jsp"/>
 
-            <form class="login-form" method="post" action="${pageContext.request.contextPath}/login">
-                <div class="form-row">
-                    <label for="login">Email ou username</label>
-                    <input id="login" name="login" type="text" required>
-                </div>
-                <div class="form-row">
-                    <label for="password">Mot de passe</label>
-                    <input id="password" name="password" type="password" required>
-                </div>
-                <div class="login-actions">
-                    <span class="muted">SGDA securise l acces et les actions selon votre role.</span>
-                    <button class="btn btn-primary" type="submit">Se connecter</button>
-                </div>
-            </form>
+                <form class="login-form auth-form" method="post" action="${pageContext.request.contextPath}/login">
+                    <div class="auth-field">
+                        <label for="login">Nom d utilisateur ou email</label>
+                        <div class="auth-input-shell auth-input-shell-user">
+                            <span class="auth-input-icon auth-input-icon-user" aria-hidden="true"></span>
+                            <input
+                                id="login"
+                                name="login"
+                                type="text"
+                                required
+                                autocomplete="username"
+                                autocapitalize="none"
+                                spellcheck="false"
+                                placeholder="Nom d utilisateur"
+                            >
+                        </div>
+                    </div>
 
-            <div class="login-assurance">
-                <div class="login-assurance-item">
-                    <strong>Clarte operationnelle</strong>
-                    <span>Un parcours simple pour soumettre, traiter et superviser sans confusion.</span>
-                </div>
-                <div class="login-assurance-item">
-                    <strong>Trajectoire visible</strong>
-                    <span>Chaque demande reste suivie avec un historique lisible et une responsabilite claire.</span>
-                </div>
-                <div class="login-assurance-item">
-                    <strong>Experience premium</strong>
-                    <span>Une interface universitaire moderne qui inspire confiance des la premiere impression.</span>
-                </div>
+                    <div class="auth-field">
+                        <label for="password">Mot de passe</label>
+                        <div class="auth-input-shell auth-input-shell-password">
+                            <span class="auth-input-icon auth-input-icon-lock" aria-hidden="true"></span>
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                required
+                                autocomplete="current-password"
+                                placeholder="Mot de passe"
+                            >
+                            <button
+                                class="auth-password-toggle"
+                                type="button"
+                                data-password-toggle
+                                data-target="password"
+                                data-hidden-label="SHOW"
+                                data-visible-label="HIDE"
+                                aria-controls="password"
+                                aria-pressed="false"
+                            >SHOW</button>
+                        </div>
+                    </div>
+
+                    <!-- <div class="auth-meta-row">
+                        <label class="auth-remember">
+                            <input type="checkbox" name="rememberMe">
+                            <span>Se souvenir de moi</span>
+                        </label>
+                        <a class="auth-forgot" href="#auth-support">Mot de passe oublie ?</a>
+                    </div> -->
+
+                    <button class="btn btn-primary auth-submit" type="submit">Se connecter</button>
+
+                    <!-- <div class="auth-divider"><span>ou</span></div> -->
+
+                    <!-- <a class="btn btn-contour auth-secondary" href="#auth-support">Connexion alternative</a>
+
+                    <div class="auth-support" id="auth-support">
+                        <strong>Besoin d aide ?</strong>
+                        <span>
+                            Contactez l administration SGDA pour ouvrir, reactiver ou reinitialiser votre acces.
+                        </span>
+                    </div>
+
+                    <p class="auth-footer">
+                        Pas encore de compte ? <a href="#auth-support">Demandez un acces</a>
+                    </p> -->
+                </form>
             </div>
         </section>
     </div>
 </div>
 <script src="${pageContext.request.contextPath}/assets/js/app.js"></script>
+<script>
+(function () {
+    'use strict';
+
+    document.querySelectorAll('[data-password-toggle]').forEach(function (button) {
+        var targetId = button.getAttribute('data-target');
+        var input = targetId ? document.getElementById(targetId) : null;
+
+        if (!input) {
+            return;
+        }
+
+        var hiddenLabel = button.getAttribute('data-hidden-label') || 'SHOW';
+        var visibleLabel = button.getAttribute('data-visible-label') || 'HIDE';
+
+        function syncState() {
+            var isVisible = input.type === 'text';
+            button.textContent = isVisible ? visibleLabel : hiddenLabel;
+            button.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+        }
+
+        button.addEventListener('click', function () {
+            input.type = input.type === 'password' ? 'text' : 'password';
+            syncState();
+        });
+
+        syncState();
+    });
+})();
+</script>
 </body>
 </html>
