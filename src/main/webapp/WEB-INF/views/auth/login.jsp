@@ -9,6 +9,11 @@
 </head>
 <body>
 <div class="login-shell auth-shell">
+    <div class="theme-toggle-login" aria-hidden="false">
+        <button id="loginThemeToggle" type="button" class="theme-toggle-btn" aria-label="Basculer le mode sombre">
+            <span class="theme-toggle-icon" id="loginThemeToggleIcon">🌙</span>
+        </button>
+    </div>
     <div class="auth-layout">
         <section class="login-aside auth-hero" aria-label="Presentation SGDA">
             <span class="auth-hero-orb auth-hero-orb-a" aria-hidden="true"></span>
@@ -64,7 +69,7 @@
 
                 <form class="login-form auth-form" method="post" action="${pageContext.request.contextPath}/login">
                     <div class="auth-field">
-                        <label for="login">Nom d utilisateur ou email</label>
+                        <label for="login">Nom d'utilisateur ou email</label>
                         <div class="auth-input-shell auth-input-shell-user">
                             <span class="auth-input-icon auth-input-icon-user" aria-hidden="true"></span>
                             <input
@@ -163,6 +168,35 @@
 
         syncState();
     });
+})();
+var loginThemeToggle = document.getElementById('loginThemeToggle');
+
+
+if (loginThemeToggle) {
+    loginThemeToggle.addEventListener('click', function () {
+        var current = document.documentElement.getAttribute('data-theme') || 'light';
+        var next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        try { localStorage.setItem('sgda-theme', next); } catch(e) {}
+        var icon = document.getElementById('loginThemeToggleIcon');
+        if (icon) icon.textContent = next === 'dark' ? '🌙' : '☀️';
+    });
+
+    (function syncIcon(){
+        var theme = document.documentElement.getAttribute('data-theme') || 'light';
+        var icon = document.getElementById('loginThemeToggleIcon');
+        if (icon) icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+    })();
+}
+</script>
+
+<script>
+// Theme toggle initial state sync (login)
+(function(){
+  'use strict';
+  var icon = document.getElementById('loginThemeToggleIcon');
+  var theme = document.documentElement.getAttribute('data-theme') || 'light';
+  if (icon) icon.textContent = theme === 'dark' ? '🌙' : '☀️';
 })();
 </script>
 </body>

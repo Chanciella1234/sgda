@@ -73,7 +73,7 @@
                 <div class="form-actions-bar">
                     <span class="form-actions-note">Les informations enregistrees en brouillon pourront encore etre modifiees avant soumission.</span>
                     <div class="actions">
-                        <button class="btn btn-primary" type="submit">Mettre a jour</button>
+                        <button class="btn btn-primary" type="submit">Enregistrer</button>
                         <a class="btn btn-secondary" href="${pageContext.request.contextPath}/student/demandes">Retour</a>
                     </div>
                 </div>

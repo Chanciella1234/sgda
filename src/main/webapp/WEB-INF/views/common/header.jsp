@@ -50,6 +50,7 @@
                             <a class="nav-item${activeMenu == 'dashboard' ? ' active' : ''}" href="${pageContext.request.contextPath}/student/dashboard">
                                 <span class="nav-dot"></span><span class="nav-icon icon-dashboard"></span><span class="nav-label" data-tooltip="Tableau de bord">Tableau de bord</span>
                             </a>
+
                             <a class="nav-item${activeMenu == 'demandes' ? ' active' : ''}" href="${pageContext.request.contextPath}/student/demandes">
                                 <span class="nav-dot"></span><span class="nav-icon icon-demandes"></span><span class="nav-label" data-tooltip="Demandes en cours">Demandes en cours</span>
                             </a>

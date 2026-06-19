@@ -1,7 +1,6 @@
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
                 <footer class="app-footer">
-                    <span>SGDA &copy; 2026 &mdash; Universit&eacute; Polytechnique de Gitega</span>
-                    <span>D&eacute;partement G&eacute;nie Logiciel / BAC3</span>
+                    <span>SGDA &copy; 2026 &mdash; Plateforme de Gestion des Demandes Académiques</span>
                 </footer>
             </div><!-- /.main-inner -->
         </div><!-- /.main -->

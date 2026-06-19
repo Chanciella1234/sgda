@@ -266,7 +266,7 @@
                                             </c:when>
                                             <c:otherwise>
                                                 <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/detail?id=${demande.id}">Voir detail</a>
-                                                <a class="btn btn-contour btn-sm" href="${pageContext.request.contextPath}/student/demande/new">Nouveau brouillon</a>
+                                                <!-- <a class="btn btn-contour btn-sm" href="${pageContext.request.contextPath}/student/demande/new">Nouveau brouillon</a> -->
                                             </c:otherwise>
                                         </c:choose>
                                     </div>
