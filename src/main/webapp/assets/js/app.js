@@ -180,11 +180,22 @@
       el.addEventListener('click', closeConfirm);
     });
 
-    /* Intercept forms / links with data-confirm */
+    /* Intercept links with data-confirm (logout, etc.) */
     document.addEventListener('click', function (e) {
       var trigger = e.target.closest('[data-confirm]');
       if (!trigger) return;
-      if (trigger.tagName === 'A' || (trigger.tagName === 'BUTTON' && trigger.type !== 'submit')) return;
+      if (trigger.tagName === 'A') {
+        e.preventDefault();
+        openConfirm({
+          title:        trigger.getAttribute('data-confirm-title')        || 'Confirmer l\'action',
+          message:      trigger.getAttribute('data-confirm')              || 'Voulez-vous continuer ?',
+          confirmLabel: trigger.getAttribute('data-confirm-confirm-label')|| 'Confirmer',
+          cancelLabel:  trigger.getAttribute('data-confirm-cancel-label') || 'Annuler',
+          onConfirm: function () { window.location.href = trigger.href; }
+        });
+        return;
+      }
+      if (trigger.tagName === 'BUTTON' && trigger.type !== 'submit') return;
       e.preventDefault();
       var form = trigger.closest('form') || trigger;
       openConfirm({
@@ -199,6 +210,36 @@
             window.location.href = trigger.href;
           }
         }
+      });
+    });
+
+    /* ── Sidebar active state ────────────────────────────── */
+    function updateActiveFromUrl() {
+      var path = window.location.pathname;
+      var bestMatch = null;
+      var bestLen = 0;
+      document.querySelectorAll('.sidebar .nav-item').forEach(function (el) {
+        var href = el.getAttribute('href');
+        if (href && path.indexOf(href) === 0 && href.length > bestLen) {
+          bestLen = href.length;
+          bestMatch = el;
+        }
+      });
+      if (bestMatch) {
+        document.querySelectorAll('.sidebar .nav-item').forEach(function (el) {
+          el.classList.remove('active');
+        });
+        bestMatch.classList.add('active');
+      }
+    }
+    updateActiveFromUrl();
+
+    document.querySelectorAll('.sidebar .nav-item').forEach(function (item) {
+      item.addEventListener('click', function () {
+        document.querySelectorAll('.sidebar .nav-item').forEach(function (el) {
+          el.classList.remove('active');
+        });
+        this.classList.add('active');
       });
     });
 

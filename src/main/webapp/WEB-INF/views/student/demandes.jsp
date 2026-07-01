@@ -15,14 +15,6 @@
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 <jsp:include page="/WEB-INF/views/common/flash.jsp"/>
 
-<div class="breadcrumbs">
-    <span>SGDA</span>
-    <span>/</span>
-    <span>Espace etudiant</span>
-    <span>/</span>
-    <strong>Mes demandes</strong>
-</div>
-
 <section class="content-card table-card">
     <div class="content-card-header">
         <div>

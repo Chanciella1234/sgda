@@ -109,14 +109,6 @@
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 <jsp:include page="/WEB-INF/views/common/flash.jsp"/>
 
-<div class="breadcrumbs">
-    <span>SGDA</span>
-    <span>/</span>
-    <span>Administration</span>
-    <span>/</span>
-    <strong>Supervision</strong>
-</div>
-
 <section class="content-card table-card">
     <div class="content-card-header">
         <div>

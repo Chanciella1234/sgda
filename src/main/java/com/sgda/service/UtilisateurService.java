@@ -26,6 +26,17 @@ public class UtilisateurService extends AbstractService {
                 .getResultList();
     }
 
+    public Utilisateur findById(Long utilisateurId) {
+        TypedQuery<Utilisateur> query = entityManager.createQuery(
+                "SELECT u FROM Utilisateur u JOIN FETCH u.role WHERE u.id = :id", Utilisateur.class);
+        query.setParameter("id", utilisateurId);
+        Utilisateur utilisateur = getSingleResultOrNull(query);
+        if (utilisateur == null) {
+            throw new BusinessException("Utilisateur introuvable.");
+        }
+        return utilisateur;
+    }
+
     public Utilisateur findUserForEdition(Long utilisateurId) {
         TypedQuery<Utilisateur> query = entityManager.createQuery(
                 "SELECT u FROM Utilisateur u JOIN FETCH u.role WHERE u.id = :id", Utilisateur.class);

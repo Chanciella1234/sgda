@@ -84,6 +84,15 @@
                             </a>
                         </c:when>
                     </c:choose>
+
+                    <span class="nav-section-label">Compte</span>
+                    <c:set var="roleProfilUrl" value="profil"/>
+                    <c:if test="${sessionScope.SGDA_AUTH_USER.roleCode == 'ETUDIANT'}"><c:set var="roleProfilUrl" value="student/profil"/></c:if>
+                    <c:if test="${sessionScope.SGDA_AUTH_USER.roleCode == 'AGENT'}"><c:set var="roleProfilUrl" value="agent/profil"/></c:if>
+                    <c:if test="${sessionScope.SGDA_AUTH_USER.roleCode == 'ADMIN'}"><c:set var="roleProfilUrl" value="admin/profil"/></c:if>
+                    <a class="nav-item${activeMenu == 'profil' ? ' active' : ''}" href="${pageContext.request.contextPath}/${roleProfilUrl}">
+                        <span class="nav-dot"></span><span class="nav-icon icon-profil"></span><span class="nav-label" data-tooltip="Mon profil">Mon profil</span>
+                    </a>
                 </nav>
             </div>
 

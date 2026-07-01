@@ -14,15 +14,6 @@
 </head>
 <body>
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
-
-<div class="breadcrumbs">
-    <span>SGDA</span>
-    <span>/</span>
-    <span>Agent</span>
-    <span>/</span>
-    <strong>Dashboard</strong>
-</div>
-
 <section class="dashboard-row cols-4">
     <article class="kpi-card kpi-warning">
         <div class="kpi-top">

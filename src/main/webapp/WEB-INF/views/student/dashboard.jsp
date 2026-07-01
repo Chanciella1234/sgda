@@ -16,14 +16,6 @@
 <body>
 <jsp:include page="/WEB-INF/views/common/header.jsp"/>
 
-<div class="breadcrumbs">
-    <span>SGDA</span>
-    <span>/</span>
-    <span>Espace etudiant</span>
-    <span>/</span>
-    <strong>Dashboard</strong>
-</div>
-
 <section class="hero-card">
     <div class="hero-grid">
         <div>
