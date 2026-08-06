@@ -1,0 +1,227 @@
+@startuml ARCH_Layers
+skinparam component {
+    BackgroundColor #FEFAE8
+    BorderColor #1A2E0F
+    FontSize 13
+    ArrowColor #1A2E0F
+}
+skinparam package {
+    BorderColor #C98A3E
+    FontSize 15
+    FontStyle bold
+}
+skinparam database {
+    BackgroundColor #F5EDD0
+    BorderColor #A86E28
+    FontSize 13
+}
+skinparam node {
+    BackgroundColor #FFFFFF
+    BorderColor #1A2E0F
+}
+skinparam arrow {
+    Color #1A2E0F
+    FontSize 11
+}
+skinparam backgroundColor #FFFFFF
+skinparam titleFontSize 18
+skinparam legendFontSize 12
+
+title Architecture en couches - **SGDA**\nSystème de Gestion des Demandes Académiques
+
+' ═══════════════════════════════════════════════════
+' CLIENT
+' ═══════════════════════════════════════════════════
+node "Client (Navigateur)" as Client {
+    component "HTML / CSS / JS" as ClientAssets
+    component "Cookies\n(JSESSIONID)" as Cookie
+}
+
+' ═══════════════════════════════════════════════════
+' COUCHE WEB  (Servlet 6.0 / JSP / JSTL)
+' ═══════════════════════════════════════════════════
+package "Couche Présentation\n<<Jakarta Servlet 6.0 + JSP/JSTL>>" as WebLayer {
+
+    package "Filtres" {
+        component "AuthFilter\n@WebFilter\n(/student/*, /agent/*, /admin/*)" as AuthFilter
+    }
+
+    package "Servlets" {
+        component "BaseServlet\n HttpServlet\n- getAuthenticatedUser()\n- forward() / redirect()\n- setFlash() / exposeFlash()\n- writeJson()" as BaseServlet
+
+        component "LoginServlet\nLogoutServlet\nProfileServlet" as AuthServlets
+
+        component "Student*\nServlets\n(7 servlets)" as StudentServlets
+        component "Agent*\nServlets\n(8 servlets)" as AgentServlets
+        component "Admin*\nServlets\n(9 servlets)" as AdminServlets
+    }
+
+    package "Vue JSP <<JSTL>>" {
+        component "header.jsp\nfooter.jsp\nflash.jsp\nerror.jsp\ni18n.jsp\nprofil.jsp\ndemande-detail.jsp" as CommonJSP
+        component "auth/\nlogin.jsp" as AuthJSP
+        component "student/\n3 JSP" as StudentJSP
+        component "agent/\n3 JSP" as AgentJSP
+        component "admin/\n4 JSP" as AdminJSP
+    }
+
+    package "Utilitaires Web" {
+        component "SessionKeys\n AUTH_USER,\n FLASH_TYPE,\n FLASH_MESSAGE" as SessionKeys
+        component "ServletUtils\n param()\n paramAsLong()" as ServletUtils
+        component "JsonUtils\nwriteJson()" as JsonUtils
+        component "StoredFileInfo" as StoredFileInfo
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' COUCHE MÉTIER  (EJB Stateless)
+' ═══════════════════════════════════════════════════
+package "Couche Métier\n<<Jakarta EJB 4.0 (@Stateless)>>" as BizLayer {
+
+    package "Services (@Stateless)" {
+        component "AbstractService\n@PersistenceContext\nEntityManager\n- normalize()\n- requireText()\n- requireEntity()\n- requireUtilisateurActif()\n- requireRole()\n- requireEtat()\n- enregistrerTransition()\n- getSingleResultOrNull()" as AbsService
+
+        component "AuthService\n @Stateless\n- authenticate()" as AuthService
+
+        component "DemandeService\n @Stateless\n- listByEtudiant()\n- listDemandesPourAgent()\n- listAllDemandes()\n- createDraft()\n- updateDraft()\n- deleteDraft()\n- soumettre()\n- prendreEnCharge()\n- valider()\n- refuser()\n- archiver()\n- ajouterPieceJointe()\n- supprimerPieceJointe()" as DemandeService
+
+        component "UtilisateurService\n @Stateless" as UserService
+        component "TypeDemandeService\n @Stateless" as TypeService
+        component "DashboardService\n @Stateless\n- getAdminDashboard()\n- getAgentDashboard()\n- getStudentDashboard()" as DashService
+    }
+
+    package "DTO" {
+        component "AuthenticatedUser\n {id, username,\nfullName,\nroleCode,\nroleLabel}" as DTOUser
+        component "AdminDashboardData\nAgentDashboardData\nStudentDashboardData\nChartSeriesData\nRoleStat" as DTODash
+    }
+
+    package "Exceptions Métier" {
+        component "BusinessException\n erreurs validation" as BizEx
+        component "WorkflowException\n erreurs état workflow" as WorkEx
+        component "AuthorizationException\n erreurs accès/propriété" as AuthEx
+    }
+
+    package "Utilitaires Métier" {
+        component "PasswordUtils\n hashPassword()\n verifyPassword()\n needsRehash()" as PassUtils
+    }
+}
+
+' ═══════════════════════════════════════════════════
+' COUCHE PERSISTANCE  (JPA 3.0)
+' ═══════════════════════════════════════════════════
+package "Couche Persistance\n<<Jakarta Persistence 3.0 (JPA)>>" as DALayer {
+
+    package "Entités JPA (@Entity)" {
+        component "Role\n id, code, libelle" as EntRole
+        component "Utilisateur\n id, username, email,\nmotDePasse, nom,\nprenom, actif" as EntUser
+        component "Demande\n id, code, objet,\ndescription, dates,\nmotifRefus, @Version" as EntDemande
+        component "TypeDemande\n id, code, libelle" as EntType
+        component "EtatDemande\n id, code, libelle, ordre" as EntEtat
+        component "Commentaire\n id, contenu, creeLe" as EntComment
+        component "PieceJointe\n id, nomOriginal, mime,\ntaille, chemin, sha256" as EntPiece
+        component "HistoriqueTransition\n id, commentaire,\ncreeLe" as EntHist
+    }
+
+    package "Enums" {
+        component "RoleCode\n{ETUDIANT,\nAGENT, ADMIN}" as EnumRole
+        component "EtatDemandeCode\n{BROUILLON,\nSOUMISE,\nEN_ATTENTE,\nVALIDEE,\nREFUSEE,\nARCHIVEE}" as EnumEtat
+    }
+
+    component "Persistence Unit\nsgdaPU\n(JTA, jdbc/SGDADS)" as PU
+    component "EntityManager\n(@PersistenceContext)" as EM
+}
+
+' ═══════════════════════════════════════════════════
+' BASE DE DONNÉES
+' ═══════════════════════════════════════════════════
+database "Base de Données\nMySQL / PostgreSQL\n(jdbc/SGDADS)" as DB
+
+' ═══════════════════════════════════════════════════
+' CONNEXIONS ENTRE COUCHES
+' ═══════════════════════════════════════════════════
+
+' Client → Web
+Client -down-> AuthFilter : HTTP\nRequest/Response
+
+' Filtre → Servlets
+AuthFilter -down-> BaseServlet : chain.doFilter()\nsi session OK + bon rôle
+AuthFilter -right-> Client : redirect(/login)\nsi non authentifié
+
+' Servlets → Vue
+BaseServlet -down-> CommonJSP : forward() / redirect()
+StudentServlets -down-> StudentJSP
+AgentServlets -down-> AgentJSP
+AdminServlets -down-> AdminJSP
+AuthServlets -down-> AuthJSP
+
+' Servlets → Utilitaires
+BaseServlet -right-> SessionKeys : lecture session
+BaseServlet -right-> ServletUtils : extraction params
+
+' Servlets → Services (CDI @Inject)
+StudentServlets -down-> DemandeService : @Inject
+AgentServlets -down-> DemandeService : @Inject
+AdminServlets -down-> DemandeService : @Inject
+AdminServlets -down-> UserService : @Inject
+AdminServlets -down-> TypeService : @Inject
+AdminServlets -down-> DashService : @Inject
+AgentServlets -down-> DashService : @Inject
+StudentServlets -down-> DashService : @Inject
+AuthServlets -down-> AuthService : @Inject
+AdminServlets -down-> TypeService : @Inject
+
+' Services → AbstractService (héritage)
+AuthService ..> AbsService : extends
+DemandeService ..> AbsService : extends
+UserService ..> AbsService : extends
+TypeService ..> AbsService : extends
+DashService ..> AbsService : extends
+
+' Services → DTO
+AuthService ..> DTOUser : crée
+DashService ..> DTODash : retourne
+
+' Services → Exceptions
+AbsService ..> BizEx : throw
+AbsService ..> WorkEx : throw
+AbsService ..> AuthEx : throw
+
+' Services → PasswordUtils
+AuthService ..> PassUtils : utilise
+
+' AbstractService → EntityManager
+AbsService -down-> EM : @PersistenceContext\nunitName="sgdaPU"
+
+' EM → PU
+EM -down-> PU : persist(), find(),\ncreateQuery(), merge()
+
+' PU → Entités
+PU -down-> EntRole
+PU -down-> EntUser
+PU -down-> EntDemande
+PU -down-> EntType
+PU -down-> EntEtat
+PU -down-> EntComment
+PU -down-> EntPiece
+PU -down-> EntHist
+
+' Enums → Entités
+EnumRole -right-> EntUser : role
+EnumEtat -right-> EntDemande : etat
+EnumEtat -right-> EntHist : deEtat / versEtat
+
+' Entités → DB
+PU -down-> DB : JDBC / JTA\nDataSource\njdbc/SGDADS
+
+' ═══════════════════════════════════════════════════
+' LÉGENDE
+' ═══════════════════════════════════════════════════
+legend bottom right
+  |= Couche |= Technologie |= Rôle |
+  | **Présentation** | Servlet 6.0 + JSP/JSTL | Routing, session, rendu HTML |
+  | **Métier** | EJB @Stateless | Logique métier, validation, workflow |
+  | **Persistance** | JPA 3.0 + EntityManager | ORM, requêtes JPQL |
+  | **Données** | MySQL/PostgreSQL (JTA) | Stockage relationnel |
+  | **Sécurité** | AuthFilter + Session | Authentification, autorisation |
+endlegend
+
+@enduml

@@ -1,0 +1,137 @@
+@startuml SEQ_AgentProcess
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipantBorderColor #1A2E0F
+skinparam sequenceLifeLineBorderColor #C98A3E
+skinparam sequenceMessageFontSize 12
+skinparam sequenceParticipantFontSize 13
+skinparam sequenceDividerFontSize 13
+skinparam backgroundColor #FFFFFF
+skinparam titleFontSize 16
+
+title Scénario 3 : Traitement d'une demande par l'agent\n(Prise en charge → Validation OU Refus)\n**SGDA**
+
+actor "Agent" as Agent
+participant "demandes.jsp\n(liste en attente)" as ListJSP
+participant "AgentDemandeTakeServlet\n(/agent/demande/take)" as TakeServlet
+participant "AgentDemandeValiderServlet\n(/agent/demande/valider)" as ValiderServlet
+participant "AgentDemandeRefuserServlet\n(/agent/demande/refuser)" as RefuserServlet
+participant "DemandeService\n(@Stateless)" as Service
+database "Base de Données" as DB
+participant "demandes-traitees.jsp\n(liste traitées)" as TraiteesJSP
+
+== Étape 1 : Prise en charge ==
+
+Agent -> ListJSP : GET /agent/demandes\n(affiche demandes SOUMISE + EN_ATTENTE)
+ListJSP --> Agent : Liste des demandes\n+ bouton "Prendre en charge"
+
+Agent -> TakeServlet : POST /agent/demande/take\n{id=42}
+activate TakeServlet
+
+TakeServlet -> TakeServlet : getAuthenticatedUser()
+
+TakeServlet -> Service : prendreEnCharge(demandeId=42, agentId)
+activate Service
+
+Service -> DB : SELECT d FROM Demande d\nJOIN FETCH etat, etudiant\nWHERE id = 42
+DB --> Service : Demande {etat=SOUMISE, agent=null}
+
+Service -> Service : requireRole(AGENT)\nVérifie rôle agent
+Service -> Service : ensureState(SOUMISE)\nSeule une demande SOUMISE peut être prise en charge
+
+Service -> DB : SELECT etat WHERE code = 'EN_ATTENTE'
+DB --> Service : EtatDemande
+
+Service -> DB : UPDATE demande\nSET etat_id = EN_ATTENTE,\n    agent_id = :agentId,\n    date_prise_en_charge = NOW()
+DB --> Service : OK
+
+Service -> DB : INSERT INTO historique_transition\n(de='SOUMISE', vers='EN_ATTENTE',\nacteur=agent, commentaire='Prise en charge')
+DB --> Service : OK
+
+Service --> TakeServlet : void (succès)
+deactivate Service
+
+TakeServlet -> ListJSP : redirect(/agent/demandes)\n+ flash "Demande prise en charge"
+deactivate TakeServlet
+
+ListJSP --> Agent : Liste mise à jour\n+ toast succès\nDemande passée en **EN_ATTENTE**
+
+== Étape 2a : Validation ==
+
+Agent -> ValiderServlet : POST /agent/demande/valider\n{id=42}
+activate ValiderServlet
+
+ValiderServlet -> ValiderServlet : getAuthenticatedUser()
+
+ValiderServlet -> Service : valider(demandeId=42, agentId)
+activate Service
+
+Service -> DB : SELECT d FROM Demande d\nJOIN FETCH etat\nWHERE id = 42
+DB --> Service : Demande {etat=EN_ATTENTE, agent=agentId}
+
+Service -> Service : ensureState(EN_ATTENTE)\nLa demande doit être en attente
+Service -> Service : ensureAssignedAgent()\nVérifie que l'agent est bien l'assigné
+
+Service -> DB : SELECT etat WHERE code = 'VALIDEE'
+DB --> Service : EtatDemande
+
+Service -> DB : UPDATE demande\nSET etat_id = VALIDEE,\n    date_decision = NOW(),\n    motif_refus = NULL
+DB --> Service : OK
+
+Service -> DB : INSERT INTO historique_transition\n(de='EN_ATTENTE', vers='VALIDEE',\nacteur=agent, commentaire='Validation')
+DB --> Service : OK
+
+Service --> ValiderServlet : void (succès)
+deactivate Service
+
+ValiderServlet -> TraiteesJSP : redirect(/agent/demandes-traitees)\n+ flash "Demande validée"
+deactivate ValiderServlet
+
+TraiteesJSP --> Agent : Liste traitées\n+ toast succès\nDemande en état **VALIDEE**
+
+== Étape 2b : Refus (alternative) ==
+
+Agent -> RefuserServlet : POST /agent/demande/refuser\n{id=42, motif="Documents incomplets"}
+activate RefuserServlet
+
+RefuserServlet -> RefuserServlet : getAuthenticatedUser()
+
+RefuserServlet -> Service : refuser(demandeId=42, agentId, motif)
+activate Service
+
+Service -> Service : requireText(motif)\nMotif de refus obligatoire
+
+Service -> DB : SELECT d FROM Demande d\nJOIN FETCH etat\nWHERE id = 42
+DB --> Service : Demande {etat=EN_ATTENTE, agent=agentId}
+
+Service -> Service : ensureState(EN_ATTENTE)\nLa demande doit être en attente
+Service -> Service : ensureAssignedAgent()\nVérifie que l'agent est bien l'assigné
+
+Service -> DB : SELECT etat WHERE code = 'REFUSEE'
+DB --> Service : EtatDemande
+
+Service -> DB : UPDATE demande\nSET etat_id = REFUSEE,\n    date_decision = NOW(),\n    motif_refus = 'Documents incomplets'
+DB --> Service : OK
+
+Service -> DB : INSERT INTO historique_transition\n(de='EN_ATTENTE', vers='REFUSEE',\nacteur=agent, commentaire='Documents incomplets')
+DB --> Service : OK
+
+Service --> RefuserServlet : void (succès)
+deactivate Service
+
+RefuserServlet -> TraiteesJSP : redirect(/agent/demandes-traitees)\n+ flash "Demande refusée"
+deactivate RefuserServlet
+
+TraiteesJSP --> Agent : Liste traitées\n+ toast succès\nDemande en état **REFUSEE**
+
+== Notes sur les erreurs ==
+
+note over Agent, DB
+  **Erreurs possibles :**
+  - Demande introuvable → BusinessException
+  - Mauvais état (pas SOUMISE pour take, pas EN_ATTENTE pour valider/refuser) → WorkflowException
+  - Agent non assigné → AuthorizationException
+  - Motif vide (refus) → BusinessException
+  - Rôle non autorisé → AuthorizationException
+end note
+
+@enduml

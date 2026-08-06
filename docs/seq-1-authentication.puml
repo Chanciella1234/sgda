@@ -1,0 +1,94 @@
+@startuml SEQ_Authentication
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipantBorderColor #1A2E0F
+skinparam sequenceLifeLineBorderColor #C98A3E
+skinparam sequenceMessageFontSize 12
+skinparam sequenceParticipantFontSize 13
+skinparam sequenceDividerFontSize 13
+skinparam backgroundColor #FFFFFF
+skinparam titleFontSize 16
+
+title Scénario 1 : Authentification et redirection par rôle\n**SGDA**
+
+actor "Étudiant/\nAgent/\nAdmin" as User
+participant "login.jsp" as JSP
+participant "LoginServlet\n(/login)" as Servlet
+participant "AuthFilter\n(/student/*, /agent/*, /admin/*)" as Filter
+participant "AuthService\n(@Stateless)" as Service
+database "Base de Données\nMySQL/PostgreSQL" as DB
+participant "DashboardServlet\n(cible)" as Dash
+
+== GET /login ==
+
+User -> Servlet : GET /login
+Servlet -> JSP : forward(login.jsp)
+JSP --> User : Affiche formulaire\n(login + password)
+
+== POST /login (Authentification) ==
+
+User -> Servlet : POST /login\n{login, password}
+activate Servlet
+
+Servlet -> Servlet : ServletUtils.param()\nRécupération login + password
+
+Servlet -> Service : authenticate(login, password)
+activate Service
+
+Service -> Service : requireText(login)\nrequireText(password)
+Service -> Service : normalize(login)\nnormalize email en minuscule
+
+Service -> DB : SELECT u FROM Utilisateur u\nJOIN FETCH u.role\nWHERE username = :login\nOR LOWER(email) = :email
+activate DB
+DB --> Service : Utilisateur (ou null)
+deactivate DB
+
+alt Utilisateur non trouvé
+    Service --> Servlet : throw BusinessException\n("Aucun utilisateur...")
+    Servlet -> JSP : forward(login.jsp)\n+ error message
+    JSP --> User : Affiche erreur
+else Utilisateur trouvé
+    Service -> Service : PasswordUtils.verifyPassword()\nComparaison hash bcrypt
+
+    alt Mot de passe incorrect
+        Service --> Servlet : throw BusinessException\n("Mot de passe incorrect")
+        Servlet -> JSP : forward(login.jsp)\n+ error message
+        JSP --> User : Affiche erreur
+    else Compte désactivé
+        Service -> Service : vérifie utilisateur.isActif()
+        Service --> Servlet : throw BusinessException\n("Compte desactive")
+        Servlet -> JSP : forward(login.jsp)\n+ error message
+        JSP --> User : Affiche erreur
+    else Authentification OK
+        Service -> Service : needsRehash?\n→ update hash si nécessaire
+        Service -> DB : UPDATE utilisateur\n(dernier_login_le, mot_de_passe)
+        Service --> Servlet : AuthenticatedUser\n{id, roleCode, nom, prenom}
+        deactivate Service
+
+        Servlet -> Servlet : session.setAttribute\n(AUTH_USER, user)
+
+        deactivate Servlet
+
+        alt roleCode == "ADMIN"
+            Servlet -> Servlet : redirect(/admin/dashboard)
+        else roleCode == "AGENT"
+            Servlet -> Servlet : redirect(/agent/dashboard)
+        else roleCode == "ETUDIANT"
+            Servlet -> Servlet : redirect(/student/dashboard)
+        end
+
+        Servlet ->> Filter : GET /{role}/dashboard
+        activate Filter
+
+        Filter -> Filter : session.getAttribute(AUTH_USER)
+        Filter -> Filter : Vérifie roleCode\nvs chemin (/student/*, etc.)
+
+        alt Session invalide ou mauvais rôle
+            Filter -> Servlet : redirect(/login)
+        else OK
+            Filter ->> Dash : chain.doFilter()
+            deactivate Filter
+        end
+    end
+end
+
+@enduml

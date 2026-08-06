@@ -1,0 +1,126 @@
+@startuml SGDA_Usecase
+left to right direction
+skinparam packageStyle rectangle
+skinparam actorStyle awesome
+skinparam usecaseBackgroundColor #FEFAE8
+skinparam usecaseBorderColor #C98A3E
+skinparam usecaseFontSize 13
+skinparam actorFontSize 14
+skinparam packageFontSize 15
+skinparam packageBorderColor #1A2E0F
+skinparam noteFontSize 11
+skinparam arrowColor #1A2E0F
+skinparam backgroundColor #FFFFFF
+
+title Diagramme de Cas d'Utilisation\n**SGDA - Système de Gestion des Demandes Académiques**
+
+rectangle "Système SGDA" {
+
+    ' ── Authentification ──
+    usecase "S'authentifier" as UC_Login
+    usecase "Se déconnecter" as UC_Logout
+    usecase "Consulter son profil" as UC_Profil
+
+    ' ── Étudiant ──
+    usecase "Consulter le Dashboard" as UC_DashEtudiant
+    usecase "Créer une demande" as UC_CreerDemande
+    usecase "Modifier une demande" as UC_ModifierDemande
+    usecase "Soumettre une demande" as UC_SoumettreDemande
+    usecase "Supprimer une demande\n(brouillon uniquement)" as UC_SupprimerDemande
+    usecase "Consulter ses demandes" as UC_ListeDemandesEtudiant
+    usecase "Voir le détail d'une demande" as UC_DetailDemandeEtudiant
+
+    ' ── Agent ──
+    usecase "Consulter le Dashboard\n(agent)" as UC_DashAgent
+    usecase "Consulter les demandes\nen attente" as UC_DemandesEnAttente
+    usecase "Prendre en charge\nune demande" as UC_PrendreEnCharge
+    usecase "Valider une demande" as UC_ValiderDemande
+    usecase "Refuser une demande" as UC_RefuserDemande
+    usecase "Consulter les demandes\ntraitées" as UC_DemandesTraitees
+    usecase "Voir le détail d'une demande\n(agent)" as UC_DetailDemandeAgent
+
+    ' ── Admin ──
+    usecase "Consulter le Dashboard\n(admin)" as UC_DashAdmin
+    usecase "Consulter toutes\nles demandes" as UC_ToutesLesDemandes
+    usecase "Archiver une demande" as UC_ArchiverDemande
+    usecase "Voir le détail d'une demande\n(admin)" as UC_DetailDemandeAdmin
+    usecase "Gérer les utilisateurs" as UC_GererUsers
+    usecase "Créer / Modifier\nun utilisateur" as UC_CRUDUser
+    usecase "Gérer les types\nde demande" as UC_GererTypes
+    usecase "Créer / Modifier\nun type de demande" as UC_CRUDType
+    usecase "Voir tendances\ndashboard" as UC_Tendances
+
+    ' ── Visiteur ──
+    usecase "Consulter la page\nd'accueil" as UC_Landing
+}
+
+' ── Acteurs ──
+actor "Étudiant" as Etudiant
+actor "Agent" as Agent
+actor "Administrateur" as Admin
+actor "Visiteur" as Visiteur
+
+' ── Visiteur ──
+Visiteur --> UC_Landing
+Visiteur --> UC_Login
+
+' ── Authentification commune ──
+UC_Login ..> UC_Logout : <<include>>
+UC_Logout ..> UC_Landing : <<include>>
+
+' ── Étudiant ──
+Etudiant --> UC_Login
+Etudiant --> UC_DashEtudiant
+Etudiant --> UC_CreerDemande
+Etudiant --> UC_ListeDemandesEtudiant
+Etudiant --> UC_Profil
+
+UC_CreerDemande ..> UC_ModifierDemande : <<include>>
+UC_CreerDemande ..> UC_SoumettreDemande : <<extend>>
+UC_ModifierDemande ..> UC_SupprimerDemande : <<extend>>
+UC_ListeDemandesEtudiant --> UC_DetailDemandeEtudiant
+UC_DetailDemandeEtudiant ..> UC_ModifierDemande : <<extend>>
+
+' ── Agent ──
+Agent --> UC_Login
+Agent --> UC_DashAgent
+Agent --> UC_DemandesEnAttente
+Agent --> UC_DemandesTraitees
+Agent --> UC_Profil
+
+UC_DemandesEnAttente --> UC_DetailDemandeAgent
+UC_DetailDemandeAgent ..> UC_PrendreEnCharge : <<extend>>
+UC_PrendreEnCharge ..> UC_ValiderDemande : <<extend>>
+UC_PrendreEnCharge ..> UC_RefuserDemande : <<extend>>
+
+' ── Admin ──
+Admin --> UC_Login
+Admin --> UC_DashAdmin
+Admin --> UC_ToutesLesDemandes
+Admin --> UC_GererUsers
+Admin --> UC_GererTypes
+Admin --> UC_Profil
+
+UC_DashAdmin ..> UC_Tendances : <<extend>>
+UC_ToutesLesDemandes --> UC_DetailDemandeAdmin
+UC_DetailDemandeAdmin ..> UC_ArchiverDemande : <<extend>>
+UC_GererUsers --> UC_CRUDUser
+UC_GererTypes --> UC_CRUDType
+
+' ── Notes ──
+note right of UC_SupprimerDemande
+  Seulement si l'état
+  est **BROUILLON**
+end note
+
+note right of UC_ArchiverDemande
+  Seulement si l'état
+  est **VALIDEE** ou **REFUSEE**
+end note
+
+note bottom of UC_PrendreEnCharge
+  L'agent s'assigne
+  la demande
+end note
+
+@enduml

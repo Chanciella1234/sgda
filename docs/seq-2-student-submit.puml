@@ -1,0 +1,111 @@
+@startuml SEQ_StudentSubmit
+skinparam sequenceArrowThickness 2
+skinparam sequenceParticipantBorderColor #1A2E0F
+skinparam sequenceLifeLineBorderColor #C98A3E
+skinparam sequenceMessageFontSize 12
+skinparam sequenceParticipantFontSize 13
+skinparam sequenceDividerFontSize 13
+skinparam backgroundColor #FFFFFF
+skinparam titleFontSize 16
+
+title Scénario 2 : Création et soumission d'une demande\npar l'étudiant\n**SGDA**
+
+actor "Étudiant" as Etudiant
+participant "demande-form.jsp\n(formulaire)" as FormJSP
+participant "StudentDemandeSaveServlet\n(/student/demande/save)" as SaveServlet
+participant "StudentDemandeSubmitServlet\n(/student/demande/submit)" as SubmitServlet
+participant "DemandeService\n(@Stateless)" as Service
+database "Base de Données" as DB
+participant "demandes.jsp\n(liste)" as ListJSP
+
+== Étape 1 : Affichage du formulaire ==
+
+Etudiant -> FormJSP : GET /student/demande/form\n(ou clic "Nouvelle demande")
+FormJSP --> Etudiant : Formulaire\n(type, objet, description)
+
+== Étape 2 : Sauvegarde du brouillon (POST) ==
+
+Etudiant -> SaveServlet : POST /student/demande/save\n{id=null, typeDemandeId, objet, description}
+activate SaveServlet
+
+SaveServlet -> SaveServlet : getAuthenticatedUser()\nRécupère user en session
+SaveServlet -> SaveServlet : ServletUtils.param()\nRécupère tous les champs
+
+SaveServlet -> Service : createDraft(userId, typeDemandeId, objet, description)
+activate Service
+
+Service -> Service : requireUtilisateurActif(userId)\nVérifie utilisateur actif
+Service -> Service : requireRole(ETUDIANT)\nVérifie rôle étudiant
+Service -> Service : requireText(objet)\nValidation objet non vide
+
+Service -> DB : SELECT typeDemande WHERE id = :id AND actif = true
+DB --> Service : TypeDemande
+
+Service -> DB : SELECT etat WHERE code = 'BROUILLON'
+DB --> Service : EtatDemande
+
+Service -> DB : INSERT INTO demande\n(code='TMP', etudiant_id, type_demande_id, etat_id, objet, description, date_creation)
+activate DB
+DB --> Service : id généré (IDENTITY)
+deactivate DB
+
+Service -> DB : UPDATE demande SET code = 'SGDA-2026-000042'\n(format: SGDA-{annee}-{id 6 chiffres})
+
+Service -> DB : INSERT INTO historique_transition\n(demande_id, vers_etat_id, acteur_id, commentaire)
+DB --> Service : OK
+
+Service --> SaveServlet : Demande {id, code='SGDA-2026-000042'}
+deactivate Service
+
+SaveServlet -> SaveServlet : setFlash("success",\n"Demande en brouillon créée : SGDA-2026-000042")
+SaveServlet -> ListJSP : redirect(/student/demandes)
+deactivate SaveServlet
+
+ListJSP --> Etudiant : Liste des demandes\n+ toast succès
+
+== Étape 3 : Soumission (clic "Soumettre") ==
+
+Etudiant -> SubmitServlet : POST /student/demande/submit\n{id=42}
+activate SubmitServlet
+
+SubmitServlet -> SubmitServlet : getAuthenticatedUser()
+
+SubmitServlet -> Service : soumettre(demandeId=42, userId)
+activate Service
+
+Service -> DB : SELECT d FROM Demande d\nJOIN FETCH etat, typeDemande\nWHERE id = 42
+DB --> Service : Demande {etat=BROUILLON}
+
+Service -> Service : ensureEtudiantOwner()\nVérifie propriétaire
+Service -> Service : ensureState(BROUILLON)\nVérifie état autorisé
+
+Service -> DB : SELECT etat WHERE code = 'SOUMISE'
+DB --> Service : EtatDemande
+
+Service -> DB : UPDATE demande\nSET etat_id = SOUMISE,\n    date_soumission = NOW()
+DB --> Service : OK
+
+Service -> DB : INSERT INTO historique_transition\n(de='BROUILLON', vers='SOUMISE',\nacteur=étudiant, commentaire='Soumission')
+DB --> Service : OK
+
+Service --> SubmitServlet : void (succès)
+deactivate Service
+
+SubmitServlet -> SubmitServlet : setFlash("success",\n"Demande soumise à l'administration")
+SubmitServlet -> ListJSP : redirect(/student/demandes)
+deactivate SubmitServlet
+
+ListJSP --> Etudiant : Liste mise à jour\n+ toast succès\nDemande en état **SOUMISE**
+
+== Cas d'erreur ==
+
+note over Etudiant, DB
+  **Erreurs possibles :**
+  - Objet vide → BusinessException → retour formulaire
+  - Type inactif → BusinessException → retour formulaire
+  - Demande non trouvée → BusinessException
+  - Non propriétaire → AuthorizationException
+  - Mauvais état (pas BROUILLON) → WorkflowException
+end note
+
+@enduml
