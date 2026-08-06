@@ -102,6 +102,29 @@ public class UtilisateurService extends AbstractService {
         }
     }
 
+    public void updateOwnProfile(Long userId, String nom, String prenom, String email,
+            String username, String password) {
+        requireText(nom, "Le nom est obligatoire.");
+        requireText(prenom, "Le prenom est obligatoire.");
+        requireText(email, "L email est obligatoire.");
+        requireText(username, "Le nom d utilisateur est obligatoire.");
+
+        Utilisateur utilisateur = requireUtilisateurActif(userId);
+
+        String normalizedUsername = normalize(username);
+        String normalizedEmail = normalize(email).toLowerCase();
+        ensureUserIdentityAvailable(normalizedUsername, normalizedEmail, userId);
+
+        utilisateur.setNom(normalize(nom));
+        utilisateur.setPrenom(normalize(prenom));
+        utilisateur.setEmail(normalizedEmail);
+        utilisateur.setUsername(normalizedUsername);
+
+        if (!isBlank(password)) {
+            utilisateur.setMotDePasse(PasswordUtils.hashPassword(password));
+        }
+    }
+
     private void ensureUserIdentityAvailable(String username, String email, Long excludedId) {
         String usernameQuery = "SELECT COUNT(u) FROM Utilisateur u WHERE u.username = :value"
                 + (excludedId == null ? "" : " AND u.id <> :excludedId");

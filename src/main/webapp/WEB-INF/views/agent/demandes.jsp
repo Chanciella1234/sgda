@@ -1,14 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
-<c:set var="pageSection" value="Espace agent"/>
-<c:set var="pageTitle" value="Demandes a traiter"/>
-<c:set var="pageSubtitle" value="Prends en charge les nouvelles demandes soumises et traite celles qui sont deja en attente."/>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<c:set var="pageSection"><fmt:message key="section.agent"/></c:set>
+<c:set var="pageTitle"><fmt:message key="agent.demandes.page_title"/></c:set>
+<c:set var="pageSubtitle"><fmt:message key="agent.demandes.page_subtitle"/></c:set>
 <c:set var="activeMenu" value="demandes"/>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Demandes a traiter - SGDA</title>
+    <title><fmt:message key="agent.demandes.html_title"/></title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css">
 </head>
 <body>
@@ -17,8 +18,8 @@
 <section class="content-card table-card">
     <div class="content-card-header">
         <div>
-            <h2 class="content-card-title">File de traitement</h2>
-            <p class="content-card-subtitle">Consultez les demandes soumises ou en attente et executez les actions autorisees.</p>
+            <h2 class="content-card-title"><fmt:message key="agent.demandes.card.title"/></h2>
+            <p class="content-card-subtitle"><fmt:message key="agent.demandes.card.subtitle"/></p>
         </div>
     </div>
     <div class="content-card-body">
@@ -26,8 +27,8 @@
             <c:when test="${empty demandes}">
                 <div class="empty-rich">
                     <div class="empty-illustration">&#128221;</div>
-                    <h3 class="empty-title">Aucune demande en attente</h3>
-                    <p class="empty-text">Les nouvelles demandes soumises apparaitront ici pour etre prises en charge.</p>
+                    <h3 class="empty-title"><fmt:message key="agent.demandes.empty.title"/></h3>
+                    <p class="empty-text"><fmt:message key="agent.demandes.empty.text"/></p>
                 </div>
             </c:when>
             <c:otherwise>
@@ -35,11 +36,11 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th>Code</th>
-                            <th>Etudiant</th>
-                            <th>Type</th>
-                            <th>Etat</th>
-                            <th>Actions</th>
+                            <th><fmt:message key="agent.demandes.table.header.code"/></th>
+                            <th><fmt:message key="agent.demandes.table.header.etudiant"/></th>
+                            <th><fmt:message key="agent.demandes.table.header.type"/></th>
+                            <th><fmt:message key="agent.demandes.table.header.etat"/></th>
+                            <th><fmt:message key="agent.demandes.table.header.actions"/></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -51,31 +52,31 @@
                                 <td>
                                     <span class="badge badge-${demande.etat.code}">${demande.etat.libelle}</span>
                                     <c:if test="${not empty demande.agent}">
-                                        <div class="muted">Agent: ${demande.agent.nomComplet}</div>
+                                        <div class="muted"><fmt:message key="agent.demandes.table.agent_label"/> ${demande.agent.nomComplet}</div>
                                     </c:if>
                                 </td>
                                 <td>
                                     <div class="actions">
-                                        <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/agent/demande/detail?id=${demande.id}">Consulter</a>
+                                        <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/agent/demande/detail?id=${demande.id}"><fmt:message key="agent.demandes.table.consulter"/></a>
                                         <c:if test="${demande.etat.code == 'SOUMISE'}">
                                             <form method="post" action="${pageContext.request.contextPath}/agent/demande/take">
                                                 <input type="hidden" name="id" value="${demande.id}">
-                                                <button class="btn btn-warning btn-sm" type="submit">Prendre</button>
+                                                <button class="btn btn-warning btn-sm" type="submit"><fmt:message key="agent.demandes.table.prendre"/></button>
                                             </form>
                                         </c:if>
                                         <c:if test="${demande.etat.code == 'EN_ATTENTE' && demande.agent.id == sessionScope.SGDA_AUTH_USER.id}">
                                             <form method="post" action="${pageContext.request.contextPath}/agent/demande/valider">
                                                 <input type="hidden" name="id" value="${demande.id}">
-                                                <button class="btn btn-primary btn-sm" type="submit">Valider</button>
+                                                <button class="btn btn-primary btn-sm" type="submit"><fmt:message key="agent.demandes.table.valider"/></button>
                                             </form>
                                             <form method="post" action="${pageContext.request.contextPath}/agent/demande/refuser">
                                                 <input type="hidden" name="id" value="${demande.id}">
-                                                <input type="text" name="motif" placeholder="Motif de refus" required>
-                                                <button class="btn btn-danger btn-sm" type="submit">Refuser</button>
+                                                <input type="text" name="motif" placeholder='<fmt:message key="agent.demandes.table.refuser.placeholder"/>' required>
+                                                <button class="btn btn-danger btn-sm" type="submit"><fmt:message key="agent.demandes.table.refuser"/></button>
                                             </form>
                                         </c:if>
                                         <c:if test="${demande.etat.code == 'EN_ATTENTE' && (demande.agent == null || demande.agent.id != sessionScope.SGDA_AUTH_USER.id)}">
-                                            <span class="muted">Aucune action</span>
+                                            <span class="muted"><fmt:message key="agent.demandes.table.rien"/></span>
                                         </c:if>
                                     </div>
                                 </td>

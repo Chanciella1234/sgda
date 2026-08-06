@@ -1,16 +1,17 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <%@ taglib uri="jakarta.tags.functions" prefix="fn" %>
-<c:set var="pageSection" value="Espace etudiant"/>
-<c:set var="pageTitle" value="Dashboard etudiant"/>
-<c:set var="pageSubtitle" value="Suivez vos brouillons, vos demandes en cours et l historique recent de votre espace SGDA."/>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<fmt:message key="section.etudiant" var="pageSection"/>
+<fmt:message key="student.dashboard.page_title" var="pageTitle"/>
+<fmt:message key="student.dashboard.page_subtitle" var="pageSubtitle"/>
 <c:set var="activeMenu" value="dashboard"/>
 <c:set var="prenomUtilisateur" value="${fn:split(sessionScope.SGDA_AUTH_USER.fullName, ' ')[0]}"/>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard etudiant - SGDA</title>
+    <title><fmt:message key="student.dashboard.html_title"/></title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css">
 </head>
 <body>
@@ -19,12 +20,12 @@
 <section class="hero-card">
     <div class="hero-grid">
         <div>
-            <div class="hero-kicker">Espace personnel</div>
-            <h2 class="hero-title">Bonjour, ${prenomUtilisateur} !</h2>
-            <p class="hero-subtitle">Bienvenue sur votre espace de gestion des demandes. Nous y retrouvons vos brouillons, vos suivis en cours et toutes les actions utiles pour avancer rapidement.</p>
+            <div class="hero-kicker"><fmt:message key="student.dashboard.hero.kicker"/></div>
+            <h2 class="hero-title"><fmt:message key="student.dashboard.hero.greeting"/> ${prenomUtilisateur} !</h2>
+            <p class="hero-subtitle"><fmt:message key="student.dashboard.hero.subtitle"/></p>
             <div class="hero-actions">
-                <a class="btn btn-white btn-lg" href="${pageContext.request.contextPath}/student/demande/new">Nouvelle demande</a>
-                <a class="btn btn-contour btn-lg" href="${pageContext.request.contextPath}/student/demandes">Voir mes demandes</a>
+                <a class="btn btn-white btn-lg" href="${pageContext.request.contextPath}/student/demande/new"><fmt:message key="student.dashboard.hero.btn_new"/></a>
+                <a class="btn btn-contour btn-lg" href="${pageContext.request.contextPath}/student/demandes"><fmt:message key="student.dashboard.hero.btn_view"/></a>
             </div>
         </div>
         <div class="hero-illustration" aria-hidden="true">
@@ -40,9 +41,9 @@
             <span class="kpi-icon" aria-hidden="true">&#128196;</span>
         </div>
         <div class="kpi-meta">
-            <span class="kpi-label">Mes demandes</span>
+            <span class="kpi-label"><fmt:message key="student.dashboard.kpi.mes_demandes"/></span>
             <strong class="kpi-value">${dashboard.totalDemandes}</strong>
-            <span class="kpi-trend">Toutes vos demandes confondues</span>
+            <span class="kpi-trend"><fmt:message key="student.dashboard.kpi.mes_demandes.trend"/></span>
         </div>
     </article>
 
@@ -51,9 +52,9 @@
             <span class="kpi-icon" aria-hidden="true">&#9716;</span>
         </div>
         <div class="kpi-meta">
-            <span class="kpi-label">En cours</span>
+            <span class="kpi-label"><fmt:message key="student.dashboard.kpi.en_cours"/></span>
             <strong class="kpi-value">${dashboard.demandesEnCours}</strong>
-            <span class="kpi-trend">Demandes soumises ou en attente de traitement</span>
+            <span class="kpi-trend"><fmt:message key="student.dashboard.kpi.en_cours.trend"/></span>
         </div>
     </article>
 
@@ -62,9 +63,9 @@
             <span class="kpi-icon" aria-hidden="true">&#10003;</span>
         </div>
         <div class="kpi-meta">
-            <span class="kpi-label">Validees</span>
+            <span class="kpi-label"><fmt:message key="student.dashboard.kpi.validees"/></span>
             <strong class="kpi-value">${dashboard.demandesValidees}</strong>
-            <span class="kpi-trend">Demandes acceptees par l administration</span>
+            <span class="kpi-trend"><fmt:message key="student.dashboard.kpi.validees.trend"/></span>
         </div>
     </article>
 
@@ -73,9 +74,9 @@
             <span class="kpi-icon" aria-hidden="true">&#9998;</span>
         </div>
         <div class="kpi-meta">
-            <span class="kpi-label">Brouillons</span>
+            <span class="kpi-label"><fmt:message key="student.dashboard.kpi.brouillons"/></span>
             <strong class="kpi-value">${dashboard.demandesBrouillons}</strong>
-            <span class="kpi-trend">Demandes preparees mais non encore soumises</span>
+            <span class="kpi-trend"><fmt:message key="student.dashboard.kpi.brouillons.trend"/></span>
         </div>
     </article>
 </section>
@@ -84,8 +85,8 @@
     <article class="content-card">
         <div class="content-card-header">
             <div>
-                <h2 class="content-card-title">Etat de mes demandes</h2>
-                <p class="content-card-subtitle">Vue globale de votre portefeuille personnel par statut.</p>
+                <h2 class="content-card-title"><fmt:message key="student.dashboard.chart.title"/></h2>
+                <p class="content-card-subtitle"><fmt:message key="student.dashboard.chart.subtitle"/></p>
             </div>
         </div>
         <div class="content-card-body">
@@ -93,9 +94,9 @@
                 <c:when test="${dashboard.totalDemandes == 0}">
                     <div class="empty-rich">
                         <div class="empty-illustration">&#43;</div>
-                        <h3 class="empty-title">Aucune demande pour le moment</h3>
-                        <p class="empty-text">Nous pouvons commencer par creer votre premiere demande administrative depuis cet espace.</p>
-                        <a class="btn btn-primary" href="${pageContext.request.contextPath}/student/demande/new">Creer ma premiere demande</a>
+                        <h3 class="empty-title"><fmt:message key="student.dashboard.empty.title"/></h3>
+                        <p class="empty-text"><fmt:message key="student.dashboard.empty.text"/></p>
+                        <a class="btn btn-primary" href="${pageContext.request.contextPath}/student/demande/new"><fmt:message key="student.dashboard.empty.btn"/></a>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -106,24 +107,24 @@
                             </div>
                             <div class="doughnut-center">
                                 <strong>${dashboard.totalDemandes}</strong>
-                                <span>Total</span>
+                                <span><fmt:message key="student.dashboard.chart.total"/></span>
                             </div>
                         </div>
                         <div class="legend-list">
                             <div class="legend-item">
-                                <div class="legend-item-left"><span class="status-swatch status-brouillon"></span>Brouillons</div>
+                                <div class="legend-item-left"><span class="status-swatch status-brouillon"></span><fmt:message key="student.dashboard.chart.brouillons"/></div>
                                 <span>${dashboard.demandesBrouillons}</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-item-left"><span class="status-swatch status-attente"></span>En cours</div>
+                                <div class="legend-item-left"><span class="status-swatch status-attente"></span><fmt:message key="student.dashboard.chart.en_cours"/></div>
                                 <span>${dashboard.demandesEnCours}</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-item-left"><span class="status-swatch status-validee"></span>Validees</div>
+                                <div class="legend-item-left"><span class="status-swatch status-validee"></span><fmt:message key="student.dashboard.chart.validees"/></div>
                                 <span>${dashboard.demandesValidees}</span>
                             </div>
                             <div class="legend-item">
-                                <div class="legend-item-left"><span class="status-swatch status-refusee"></span>Refusees</div>
+                                <div class="legend-item-left"><span class="status-swatch status-refusee"></span><fmt:message key="student.dashboard.chart.refusees"/></div>
                                 <span>${dashboard.demandesRefusees}</span>
                             </div>
                         </div>
@@ -136,8 +137,8 @@
     <article class="content-card">
         <div class="content-card-header">
             <div>
-                <h2 class="content-card-title">Historique recent</h2>
-                <p class="content-card-subtitle">Vos cinq derniers dossiers avec leur etat le plus recent.</p>
+                <h2 class="content-card-title"><fmt:message key="student.dashboard.recent.title"/></h2>
+                <p class="content-card-subtitle"><fmt:message key="student.dashboard.recent.subtitle"/></p>
             </div>
         </div>
         <div class="content-card-body">
@@ -145,8 +146,8 @@
                 <c:when test="${empty dashboard.dernieresDemandes}">
                     <div class="empty-rich">
                         <div class="empty-illustration">&#8226;</div>
-                        <h3 class="empty-title">Pas encore d historique</h3>
-                        <p class="empty-text">Vos demandes recentes apparaitront ici des leur creation.</p>
+                        <h3 class="empty-title"><fmt:message key="student.dashboard.recent.empty.title"/></h3>
+                        <p class="empty-text"><fmt:message key="student.dashboard.recent.empty.text"/></p>
                     </div>
                 </c:when>
                 <c:otherwise>
@@ -180,7 +181,7 @@
                                 </div>
                                 <div class="actions">
                                     <span class="badge badge-${demande.etat.code}">${demande.etat.libelle}</span>
-                                    <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/detail?id=${demande.id}">Voir</a>
+                                    <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/detail?id=${demande.id}"><fmt:message key="student.dashboard.recent.btn"/></a>
                                 </div>
                             </div>
                         </c:forEach>
@@ -194,19 +195,19 @@
 <section class="content-card table-card">
     <div class="content-card-header">
         <div>
-            <h2 class="content-card-title">Mes demandes</h2>
-            <p class="content-card-subtitle">Toutes vos demandes avec les actions disponibles selon leur etat.</p>
+            <h2 class="content-card-title"><fmt:message key="student.dashboard.table.title"/></h2>
+            <p class="content-card-subtitle"><fmt:message key="student.dashboard.table.subtitle"/></p>
         </div>
-        <a class="btn btn-primary" href="${pageContext.request.contextPath}/student/demande/new">+ Nouvelle demande</a>
+        <a class="btn btn-primary" href="${pageContext.request.contextPath}/student/demande/new"><fmt:message key="student.dashboard.table.btn_new"/></a>
     </div>
     <div class="content-card-body">
         <c:choose>
             <c:when test="${empty demandes}">
                 <div class="empty-rich">
                     <div class="empty-illustration">&#128196;</div>
-                    <h3 class="empty-title">Aucune demande enregistree</h3>
-                    <p class="empty-text">Creez votre premiere demande pour commencer a suivre vos traitements administratifs depuis SGDA.</p>
-                    <a class="btn btn-primary" href="${pageContext.request.contextPath}/student/demande/new">Nouvelle demande</a>
+                    <h3 class="empty-title"><fmt:message key="student.dashboard.table.empty.title"/></h3>
+                    <p class="empty-text"><fmt:message key="student.dashboard.table.empty.text"/></p>
+                    <a class="btn btn-primary" href="${pageContext.request.contextPath}/student/demande/new"><fmt:message key="student.dashboard.hero.btn_new"/></a>
                 </div>
             </c:when>
             <c:otherwise>
@@ -214,12 +215,12 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th>Code</th>
-                            <th>Type</th>
-                            <th>Date creation</th>
-                            <th>Date soumission</th>
-                            <th>Etat</th>
-                            <th>Actions</th>
+                            <th><fmt:message key="student.dashboard.table.header.code"/></th>
+                            <th><fmt:message key="student.dashboard.table.header.type"/></th>
+                            <th><fmt:message key="student.dashboard.table.header.date_creation"/></th>
+                            <th><fmt:message key="student.dashboard.table.header.date_soumission"/></th>
+                            <th><fmt:message key="student.dashboard.table.header.etat"/></th>
+                            <th><fmt:message key="student.dashboard.table.header.actions"/></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -241,23 +242,23 @@
                                     <div class="actions">
                                         <c:choose>
                                             <c:when test="${demande.etat.code == 'BROUILLON'}">
-                                                <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/edit?id=${demande.id}">Modifier</a>
+                                                <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/edit?id=${demande.id}"><fmt:message key="student.dashboard.table.edit"/></a>
                                                 <form method="post"
                                                       action="${pageContext.request.contextPath}/student/demande/delete"
-                                                      data-confirm="La demande ${demande.code} sera supprimee definitivement de votre espace."
-                                                      data-confirm-title="Supprimer la demande"
-                                                      data-confirm-confirm-label="Supprimer"
-                                                      data-confirm-cancel-label="Annuler"
+                                                      data-confirm='<fmt:message key="student.dashboard.table.delete.confirm"><fmt:param value="${demande.code}"/></fmt:message>'
+                                                      data-confirm-title='<fmt:message key="student.dashboard.table.delete.title"/>'
+                                                      data-confirm-confirm-label='<fmt:message key="student.dashboard.table.delete.confirm_label"/>'
+                                                      data-confirm-cancel-label='<fmt:message key="student.dashboard.table.delete.cancel_label"/>'
                                                       data-confirm-variant="danger">
                                                     <input type="hidden" name="id" value="${demande.id}">
-                                                    <button class="btn btn-danger btn-sm" type="submit">Supprimer</button>
+                                                    <button class="btn btn-danger btn-sm" type="submit"><fmt:message key="student.dashboard.table.delete"/></button>
                                                 </form>
                                             </c:when>
                                             <c:when test="${demande.etat.code == 'SOUMISE' || demande.etat.code == 'EN_ATTENTE'}">
-                                                <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/detail?id=${demande.id}">Voir detail</a>
+                                                <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/detail?id=${demande.id}"><fmt:message key="student.dashboard.table.view"/></a>
                                             </c:when>
                                             <c:otherwise>
-                                                <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/detail?id=${demande.id}">Voir detail</a>
+                                                <a class="btn btn-secondary btn-sm" href="${pageContext.request.contextPath}/student/demande/detail?id=${demande.id}"><fmt:message key="student.dashboard.table.view"/></a>
                                                 <!-- <a class="btn btn-contour btn-sm" href="${pageContext.request.contextPath}/student/demande/new">Nouveau brouillon</a> -->
                                             </c:otherwise>
                                         </c:choose>
@@ -274,13 +275,14 @@
 </section>
 
 <jsp:include page="/WEB-INF/views/common/footer.jsp"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     window.sgdaCharts = window.sgdaCharts || {};
+    var colors = window.sgdaChartColors();
 
     var chartCanvas = document.getElementById('studentStatusChart');
-    if (!chartCanvas) {
+    if (!chartCanvas || typeof window.Chart === 'undefined') {
         return;
     }
 
@@ -291,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
     window.sgdaCharts.studentStatusChart = new Chart(chartCanvas, {
         type: 'doughnut',
         data: {
-            labels: ['Brouillons', 'En cours', 'Validees', 'Refusees'],
+            labels: ['<fmt:message key="student.dashboard.chart.brouillons"/>', '<fmt:message key="student.dashboard.chart.en_cours"/>', '<fmt:message key="student.dashboard.chart.validees"/>', '<fmt:message key="student.dashboard.chart.refusees"/>'],
             datasets: [{
                 data: [
                     Number('${dashboard.demandesBrouillons}'),
@@ -312,6 +314,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 legend: { display: false }
             }
         }
+    });
+
+    document.addEventListener('sgda:themechange', function () {
+        var c = window.sgdaChartColors();
+        Object.keys(window.sgdaCharts).forEach(function (key) {
+            var chart = window.sgdaCharts[key];
+            if (!chart || !chart.options) return;
+            if (chart.options.plugins && chart.options.plugins.legend && chart.options.plugins.legend.labels) {
+                chart.options.plugins.legend.labels.color = c.text;
+            }
+            if (chart.options.scales) {
+                Object.keys(chart.options.scales).forEach(function (axis) {
+                    if (chart.options.scales[axis].ticks) chart.options.scales[axis].ticks.color = c.text;
+                    if (chart.options.scales[axis].grid) chart.options.scales[axis].grid.color = c.grid;
+                });
+            }
+            chart.update();
+        });
     });
 });
 </script>

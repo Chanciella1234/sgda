@@ -1,14 +1,15 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
-<c:set var="pageSection" value="Administration"/>
-<c:set var="pageTitle" value="Gestion des types de demande"/>
-<c:set var="pageSubtitle" value="Ajoute, modifie ou desactive les types de demandes disponibles pour les etudiants."/>
+<%@ taglib uri="jakarta.tags.fmt" prefix="fmt" %>
+<c:set var="pageSection"><fmt:message key="section.admin"/></c:set>
+<c:set var="pageTitle"><fmt:message key="admin.types.page_title"/></c:set>
+<c:set var="pageSubtitle"><fmt:message key="admin.types.page_subtitle"/></c:set>
 <c:set var="activeMenu" value="types"/>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <title>Types de demande - SGDA</title>
+    <title><fmt:message key="admin.types.html_title"/></title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css">
 </head>
 <body>
@@ -19,17 +20,15 @@
     <div class="panel">
         <div class="panel-header">
             <div class="panel-title-group">
-                <h2 class="panel-title">${empty editType ? 'Nouveau type' : 'Modifier type'}</h2>
-                <p class="panel-note">Configure les types de demandes proposes dans le portail etudiant.</p>
+                <h2 class="panel-title"><c:choose><c:when test="${empty editType}"><fmt:message key="admin.types.panel.title_new"/></c:when><c:otherwise><fmt:message key="admin.types.panel.title_edit"/></c:otherwise></c:choose></h2>
+                <p class="panel-note"><fmt:message key="admin.types.panel.note"/></p>
             </div>
         </div>
         <div class="panel-body">
             <div class="form-shell">
                 <div class="form-highlight">
-                    <h3 class="form-highlight-title">${empty editType ? 'Ajouter un type de demande' : 'Modifier un type existant'}</h3>
-                    <p class="form-highlight-text">
-                        Chaque type reste historise. On le desactive si necessaire, sans jamais supprimer la categorie de demande deja utilisee.
-                    </p>
+                    <h3 class="form-highlight-title"><c:choose><c:when test="${empty editType}"><fmt:message key="admin.types.highlight.title_new"/></c:when><c:otherwise><fmt:message key="admin.types.highlight.title_edit"/></c:otherwise></c:choose></h3>
+                    <p class="form-highlight-text"><fmt:message key="admin.types.highlight.text"/></p>
                 </div>
 
                 <form method="post" action="${pageContext.request.contextPath}/admin/type/save">
@@ -39,24 +38,24 @@
                     <div class="form-grid">
                         <div class="field-card half">
                             <div class="field-title">
-                                <label for="code">Code</label>
-                                <span class="field-help">Code technique unique, stable et reutilisable dans toute l application.</span>
+                                <label for="code"><fmt:message key="admin.types.field.code"/></label>
+                                <span class="field-help"><fmt:message key="admin.types.field.code.help"/></span>
                             </div>
                             <input id="code" name="code" type="text" value="${editType.code}" required>
                         </div>
 
                         <div class="field-card half">
                             <div class="field-title">
-                                <label for="libelle">Libelle</label>
-                                <span class="field-help">Libelle visible par l etudiant lors de la creation de sa demande.</span>
+                                <label for="libelle"><fmt:message key="admin.types.field.libelle"/></label>
+                                <span class="field-help"><fmt:message key="admin.types.field.libelle.help"/></span>
                             </div>
                             <input id="libelle" name="libelle" type="text" value="${editType.libelle}" required>
                         </div>
 
                         <div class="field-card full">
                             <div class="field-title">
-                                <label for="description">Description</label>
-                                <span class="field-help">Decris l usage de ce type pour aider les utilisateurs a bien choisir.</span>
+                                <label for="description"><fmt:message key="admin.types.field.description"/></label>
+                                <span class="field-help"><fmt:message key="admin.types.field.description.help"/></span>
                             </div>
                             <textarea id="description" name="description">${editType.description}</textarea>
                         </div>
@@ -64,17 +63,17 @@
                         <div class="field-card full">
                             <label class="checkbox-inline">
                                 <input type="checkbox" name="actif" <c:if test="${empty editType || editType.actif}">checked</c:if>>
-                                Actif
-                            </label>
-                            <span class="field-help">Un type inactif n apparait plus dans les formulaires etudiants, mais reste present pour l historique.</span>
+<fmt:message key="admin.types.field.actif"/>
+                                            </label>
+                            <span class="field-help"><fmt:message key="admin.types.field.actif.help"/></span>
                         </div>
                     </div>
 
                     <div class="form-actions-bar">
-                        <span class="form-actions-note">Les types modifies sont immediatement pris en compte par le catalogue des demandes.</span>
+                        <span class="form-actions-note"><fmt:message key="admin.types.form.note"/></span>
                         <div class="actions">
-                            <button class="btn btn-primary" type="submit">Enregistrer</button>
-                            <a class="btn btn-secondary" href="${pageContext.request.contextPath}/admin/types">Nouveau</a>
+                            <button class="btn btn-primary" type="submit"><fmt:message key="admin.types.form.save"/></button>
+                            <a class="btn btn-secondary" href="${pageContext.request.contextPath}/admin/types"><fmt:message key="admin.types.form.new"/></a>
                         </div>
                     </div>
                 </form>
@@ -85,18 +84,18 @@
     <div class="panel">
         <div class="panel-header">
             <div class="panel-title-group">
-                <h2 class="panel-title">Liste des types</h2>
-                <p class="panel-note">Mets a jour les libelles et active ou desactive un type sans le supprimer.</p>
+                <h2 class="panel-title"><fmt:message key="admin.types.list.title"/></h2>
+                <p class="panel-note"><fmt:message key="admin.types.list.note"/></p>
             </div>
         </div>
         <div class="panel-body">
             <table class="table">
                 <thead>
                 <tr>
-                    <th>Code</th>
-                    <th>Libelle</th>
-                    <th>Actif</th>
-                    <th>Actions</th>
+                    <th><fmt:message key="admin.types.table.header.code"/></th>
+                    <th><fmt:message key="admin.types.table.header.libelle"/></th>
+                    <th><fmt:message key="admin.types.table.header.actif"/></th>
+                    <th><fmt:message key="admin.types.table.header.actions"/></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -104,10 +103,10 @@
                     <tr>
                         <td class="code-text">${type.code}</td>
                         <td>${type.libelle}</td>
-                        <td>${type.actif ? 'Oui' : 'Non'}</td>
+                        <td><c:choose><c:when test="${type.actif}"><fmt:message key="profil.value.oui"/></c:when><c:otherwise><fmt:message key="profil.value.non"/></c:otherwise></c:choose></td>
                         <td>
                             <a class="btn btn-secondary" href="${pageContext.request.contextPath}/admin/types?id=${type.id}">
-                                Modifier
+                                <fmt:message key="admin.types.table.modifier"/>
                             </a>
                         </td>
                     </tr>

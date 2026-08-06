@@ -1,0 +1,252 @@
+@startuml SGDA_ClassDiagram
+skinparam classAttributeIconSize 0
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam defaultFontSize 12
+skinparam classBackgroundColor #FEFAE8
+skinparam classBorderColor #1A2E0F
+skinparam packageBorderColor #C98A3E
+skinparam packageBackgroundColor #FFFFFF
+skinparam arrowColor #1A2E0F
+skinparam backgroundColor #FFFFFF
+skinparam noteFontSize 11
+skinparam noteBorderColor #C98A3E
+
+title Diagramme de Classes - Entités JPA\n**SGDA - Système de Gestion des Demandes Académiques**
+
+' ══════════════════════════════════════
+' ENUMS
+' ══════════════════════════════════════
+package "<<enumeration>>\nEnums" #F5EDD0 {
+
+    enum RoleCode {
+        ETUDIANT
+        AGENT
+        ADMIN
+    }
+
+    enum EtatDemandeCode {
+        BROUILLON
+        SOUMISE
+        EN_ATTENTE
+        VALIDEE
+        REFUSEE
+        ARCHIVEE
+    }
+}
+
+' ══════════════════════════════════════
+' ENTITÉS
+' ══════════════════════════════════════
+package "Entités JPA" {
+
+    class Role {
+        - id : Long <<PK>>
+        - code : String <<unique, 30>>
+        - libelle : String <<100>>
+        - actif : boolean
+        --
+        - utilisateurs : List<Utilisateur>
+        ..
+        + getId() : Long
+        + getCode() : String
+        + getLibelle() : String
+        + isActif() : boolean
+        + getUtilisateurs() : List
+    }
+
+    class EtatDemande {
+        - id : Long <<PK>>
+        - code : String <<unique, 30>>
+        - libelle : String <<100>>
+        - ordre : Integer
+        - actif : boolean
+        --
+        - demandes : List<Demande>
+        ..
+        + getId() : Long
+        + getCode() : String
+        + getLibelle() : String
+        + getOrdre() : Integer
+        + isActif() : boolean
+    }
+
+    class TypeDemande {
+        - id : Long <<PK>>
+        - code : String <<unique, 30>>
+        - libelle : String <<120>>
+        - description : TEXT
+        - actif : boolean
+        - creeLe : LocalDateTime
+        --
+        - demandes : List<Demande>
+        ..
+        + getId() : Long
+        + getCode() : String
+        + getLibelle() : String
+        + getDescription() : String
+        + isActif() : boolean
+        + getCreeLe() : LocalDateTime
+    }
+
+    class Utilisateur {
+        - id : Long <<PK>>
+        - username : String <<unique, 60>>
+        - email : String <<unique, 120>>
+        - motDePasse : String <<255>>
+        - nom : String <<80>>
+        - prenom : String <<80>>
+        - actif : boolean
+        - creeLe : LocalDateTime
+        - dernierLoginLe : LocalDateTime
+        --
+        - role : Role <<ManyToOne>>
+        - demandesEtudiant : List<Demande>
+        - demandesAssignees : List<Demande>
+        ..
+        + getId() : Long
+        + getUsername() : String
+        + getEmail() : String
+        + getNom() : String
+        + getPrenom() : String
+        + getNomComplet() : String
+        + isActif() : boolean
+        + hasRole(RoleCode) : boolean
+    }
+
+    class Demande {
+        - id : Long <<PK>>
+        - code : String <<unique, 40>>
+        - objet : String <<200>>
+        - description : TEXT
+        - dateCreation : LocalDateTime
+        - dateSoumission : LocalDateTime
+        - datePriseEnCharge : LocalDateTime
+        - dateDecision : LocalDateTime
+        - dateArchivage : LocalDateTime
+        - motifRefus : TEXT
+        - version : Integer <<@Version>>
+        --
+        - etudiant : Utilisateur <<ManyToOne>>
+        - agent : Utilisateur <<ManyToOne>>
+        - typeDemande : TypeDemande <<ManyToOne>>
+        - etat : EtatDemande <<ManyToOne>>
+        - commentaires : List<Commentaire>
+        - piecesJointes : List<PieceJointe>
+        - historiqueTransitions : List<HistoriqueTransition>
+        ..
+        + getId() : Long
+        + getCode() : String
+        + getObjet() : String
+        + getDescription() : String
+        + isInState(EtatDemandeCode) : boolean
+        + getDateCreation() : LocalDateTime
+        + getDateSoumission() : LocalDateTime
+        + getDatePriseEnCharge() : LocalDateTime
+        + getDateDecision() : LocalDateTime
+        + getDateArchivage() : LocalDateTime
+        + getMotifRefus() : String
+        + getVersion() : Integer
+    }
+
+    class Commentaire {
+        - id : Long <<PK>>
+        - contenu : TEXT
+        - creeLe : LocalDateTime
+        --
+        - demande : Demande <<ManyToOne>>
+        - auteur : Utilisateur <<ManyToOne>>
+        ..
+        + getId() : Long
+        + getContenu() : String
+        + getCreeLe() : LocalDateTime
+    }
+
+    class PieceJointe {
+        - id : Long <<PK>>
+        - nomOriginal : String <<255>>
+        - mimeType : String <<120>>
+        - tailleOctets : Long
+        - cheminStockage : String <<500>>
+        - sha256 : String <<64>>
+        - creeLe : LocalDateTime
+        --
+        - demande : Demande <<ManyToOne>>
+        - uploadePar : Utilisateur <<ManyToOne>>
+        ..
+        + getId() : Long
+        + getNomOriginal() : String
+        + getMimeType() : String
+        + getTailleOctets() : Long
+        + getCheminStockage() : String
+        + getSha256() : String
+        + getCreeLe() : LocalDateTime
+    }
+
+    class HistoriqueTransition {
+        - id : Long <<PK>>
+        - commentaire : TEXT
+        - creeLe : LocalDateTime
+        --
+        - demande : Demande <<ManyToOne>>
+        - deEtat : EtatDemande <<ManyToOne>>
+        - versEtat : EtatDemande <<ManyToOne>>
+        - acteur : Utilisateur <<ManyToOne>>
+        ..
+        + getId() : Long
+        + getCommentaire() : String
+        + getCreeLe() : LocalDateTime
+    }
+}
+
+' ══════════════════════════════════════
+' RELATIONS
+' ══════════════════════════════════════
+
+Role "1" -- "*" Utilisateur : a >
+
+Utilisateur "1" -- "*" Demande : est étudiant de >
+Utilisateur "1" -- "*" Demande : agent assigné >
+Utilisateur "1" -- "*" Commentaire : auteur >
+Utilisateur "1" -- "*" PieceJointe : uploade par >
+Utilisateur "1" -- "*" HistoriqueTransition : acteur >
+
+TypeDemande "1" -- "*" Demande : classifie >
+EtatDemande "1" -- "*" Demande : definit état >
+
+Demande "1" -- "*" Commentaire : contient >
+Demande "1" -- "*" PieceJointe : possède >
+Demande "1" -- "*" HistoriqueTransition : enregistre >
+
+EtatDemande "1" -- "*" HistoriqueTransition : de >
+EtatDemande "1" -- "*" HistoriqueTransition : vers >
+
+' ══════════════════════════════════════
+' NOTES
+' ══════════════════════════════════════
+
+note bottom of Demande
+  **Optimistic Locking** via @version
+  **Workflow états** :
+  BROUILLON → SOUMISE → EN_ATTENTE
+  → VALIDEE / REFUSEE → ARCHIVEE
+end note
+
+note right of PieceJointe
+  **Intégrité fichier** :
+  hash SHA-256 pour
+  vérification intégrité
+end note
+
+note left of HistoriqueTransition
+  **Traçabilité complète** :
+ 每个 transition est journalisée
+  avec auteur + horodatage
+end note
+
+note top of Role
+  3 rôles : ETUDIANT, AGENT, ADMIN
+  chaque rôle = ensemble de permissions
+end note
+
+@enduml
