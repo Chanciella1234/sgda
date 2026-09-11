@@ -29,7 +29,7 @@
 
 ## 1. Présentation du projet
 
-**SGDA** est une application web d'entreprise développée dans le cadre du cours de **Java EE — BAC3 Génie Logiciel** à l'Université Polytechnique de Gitega, année universitaire 2025–2026.
+**SGDA** est une application web d'entreprise développée dans le cadre du cours de **Java EE — BAC4 Génie Logiciel** à l'Université Polytechnique de Gitega, année universitaire 2025–2026.
 
 ### Problème résolu
 
@@ -758,8 +758,6 @@ git push origin main
 | **Chanciella** | Développeur principal | Architecture, EJB, JPA, Servlets, JSP, configuration GlassFish |
 | **Muhimpundu Gloria** | Développeur frontend | Design CSS, animations, composants visuels, pages JSP |
 
-**Encadreur** : Département Génie Logiciel — Université Polytechnique de Gitega
-
 **Année universitaire** : 2025 – 2026
 
 ---
@@ -767,5 +765,5 @@ git push origin main
 ## Licence
 
 Projet académique — Université Polytechnique de Gitega  
-Département Génie Logiciel / BAC3  
+Département Génie Logiciel / BAC4 
 © 2026 SGDA — Tous droits réservés dans le cadre académique.
